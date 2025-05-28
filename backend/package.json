@@ -1,11 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "type": "module",
   "main": "index.ts",
   "scripts": {
     "start": "ts-node dist/index.js",
-    "build": "tsc",
+    "build": "npx tsc",
     "serve": "node dist/index.js",
     "dev": "nodemon api/index.ts",
     "lint": "eslint --ext .ts .",
