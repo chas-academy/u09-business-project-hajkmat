@@ -1,12 +1,23 @@
-import app from './app';
-import config from './config/config';
+import express from 'express';
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(config.port, () => {
-    console.log(`Server running on port ${config.port}`);
-  });
-}
+const app = express();
 
-// For Vercel serverless functions
+app.use(express.json());
+
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'API is running' });
+});
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Listen unconditionally (Vercel will override PORT in production)
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
+
 export default app;
+// Export for Vercel
+module.exports = app;
