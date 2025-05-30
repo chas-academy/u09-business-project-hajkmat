@@ -36,16 +36,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: 'Server error' });
 });
 
-// Start server (conditionally for testing)
-if (process.env.NODE_ENV !== 'test') {
-  connectDB().then(() => {
-    app.listen(port, () => {
-      console.log(`Server running at http://localhost:${port}`);
-    });
+connectDB();
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
   });
 }
 
-// Export for tests and serverless functions
 export default app;
-// Export for Vercel
-module.exports = app;
