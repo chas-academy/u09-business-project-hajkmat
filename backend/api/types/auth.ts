@@ -17,7 +17,7 @@ export interface GoogleOAuthResponse {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   googleId: string;
   displayName: string;
   email: string;

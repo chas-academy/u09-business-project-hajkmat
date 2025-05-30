@@ -15,3 +15,5 @@ export const initializePassport = (req: Request, res: Response, next: NextFuncti
 export const sessionPassport = (req: Request, res: Response, next: NextFunction) => {
   passport.session()(req, res, next);
 };
+
+export const authenticate = ensureAuthenticated;
