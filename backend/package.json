@@ -28,6 +28,8 @@
     "@types/express": "^5.0.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.21",
+    "@types/passport": "^1.0.0",
+    "@types/passport-google-oauth20": "^2.0.0",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
@@ -49,6 +51,8 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "mongoose": "^8.15.1"
+    "mongoose": "^8.15.1",
+    "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0"
   }
 }

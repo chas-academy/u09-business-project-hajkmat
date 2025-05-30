@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './database/db';
 import routes from './routes/routes';
 import cors from 'cors';
+import passport from 'passport';
 
 // Load environment variables
 dotenv.config();
@@ -14,6 +15,7 @@ const port: number = parseInt(process.env.PORT || '3000', 10);
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(passport.initialize());
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
