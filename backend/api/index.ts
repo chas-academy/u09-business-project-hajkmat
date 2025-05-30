@@ -4,6 +4,7 @@ import connectDB from './database/db';
 import routes from './routes/routes';
 import cors from 'cors';
 import passport from 'passport';
+import './config/passport';
 
 // Load environment variables
 dotenv.config();
