@@ -8,6 +8,7 @@ interface IRecipe {
 export interface IUser extends Document {
   id: string;
   googleId: string;
+  displayName: string;
   email: string;
   name: string;
   recipeLists: IRecipe[];
