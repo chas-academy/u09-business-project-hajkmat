@@ -7,7 +7,7 @@ export const login = (req: Request, res: Response) => {
   passport.authenticate(
     'google',
     { session: false },
-    (err: Error | null, user: any, info: { message: string }) => {
+    (err: Error | null, user: Express.User, info: { message: string }) => {
       if (err || !user) {
         return res.status(400).json({ error: info?.message || 'Authentication failed' });
       }

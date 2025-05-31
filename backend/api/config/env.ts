@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 declare global {
   namespace NodeJS {
+    // Standard way to extend ProcessEnv no ESLint here
     interface ProcessEnv {
       PORT?: string;
       MONGODB_URI?: string;

@@ -1,6 +1,15 @@
 import passport, { Profile } from 'passport';
 import { Strategy as GoogleStrategy, VerifyCallback } from 'passport-google-oauth20';
-import User, { IUser } from '../models/user';
+import User from '../models/user';
+import { userToObject } from '../utils/auth';
+
+function createNewUser(profile: Profile) {
+  return new User({
+    googleId: profile.id,
+    displayName: profile.displayName,
+    email: profile.emails && profile.emails[0] ? profile.emails[0].value : '',
+  }).save();
+}
 
 // Type-safe environment variables
 declare const process: {
@@ -28,7 +37,7 @@ passport.use(
         // Check if user already exists in the database
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
-          return done(null, user.toObject() as any);
+          return done(null, userToObject(user || (await createNewUser(profile))));
         } else {
           // If not, create a new user
           // Safely access email if available
@@ -39,7 +48,7 @@ passport.use(
             displayName: profile.displayName,
             email: email,
           }).save();
-          return done(null, user.toObject() as any);
+          return done(null, userToObject(user || (await createNewUser(profile))));
         }
       } catch (err) {
         return done(err as Error, undefined);
@@ -49,22 +58,26 @@ passport.use(
 );
 
 // Serialize user to store in session
-passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
+// Use Express.User instead of UserObject to match Passport's expectations
+passport.serializeUser((user: Express.User, done: (err: Error | null, id?: string) => void) => {
   done(null, user.id);
 });
 
 // Deserialize user from session
-passport.deserializeUser(async (id: string, done: (err: any, user?: any) => void) => {
-  try {
-    const user = await User.findById(id);
-    if (!user) {
-      return done(new Error('User not found'), undefined);
-    }
-    // Convert to plain object to resolve type conflicts
-    return done(null, user.toObject() as any);
-  } catch (err) {
-    return done(err as Error, undefined);
-  }
-});
+passport.deserializeUser(
+  (id: string, done: (err: Error | null, user?: Express.User | null) => void) => {
+    User.findById(id)
+      .then((user) => {
+        if (!user) {
+          return done(new Error('User not found'), null);
+        }
+        // Convert Mongoose document to UserObject using your helper function
+        return done(null, userToObject(user));
+      })
+      .catch((err) => {
+        return done(err, null);
+      });
+  },
+);
 
 export default passport;
