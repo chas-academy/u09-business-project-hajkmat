@@ -1,10 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "dist/api/index.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "ts-node dist/index.js",
-    "build": "npm install typescript && npx tsc",
+    "start": "node dist/api/index.js",
+    "build": "tsc -p tsconfig.json",
     "serve": "node dist/index.js",
     "dev": "nodemon api/index.ts",
     "lint": "eslint --ext .ts .",
@@ -24,12 +25,7 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.27.0",
-    "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.2",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.21",
-    "@types/passport": "^1.0.0",
-    "@types/passport-google-oauth20": "^2.0.0",
     "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
@@ -47,6 +43,11 @@
     "typescript-eslint": "^8.32.1"
   },
   "dependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.21",
+    "@types/passport": "^1.0.0",
+    "@types/passport-google-oauth20": "^2.0.0",
     "cors": "^2.8.5",
     "mongoose": "^8.15.1",
     "passport": "^0.4.1",
@@ -55,5 +56,8 @@
     "dotenv": "^16.5.0",
     "typescript": "^5.8.3",
     "ts-node": "^10.9.2"
+  },
+    "engines": {
+    "node": "18.x"
   }
 }
