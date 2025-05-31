@@ -15,21 +15,18 @@ export default tseslint.config(
       'prettier/prettier': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
     },
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      '.eslintrc.js',
-      '**/*.js',
-      'coverage/**',
-    ],
+    ignores: ['node_modules/**', 'dist/**', 'build/**', '.eslintrc.js', '**/*.js', 'coverage/**'],
   },
   {
-    files: ['src/**/*.ts'],
+    files: ['api/**/*.ts'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
     },
-  }
+  },
 );

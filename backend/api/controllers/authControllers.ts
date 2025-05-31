@@ -28,7 +28,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     const newUser = new User({ email, name });
     await newUser.save();
     res.status(201).json({ user: newUser });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Server error' });
   }
 };
