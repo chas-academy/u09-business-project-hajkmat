@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { login, register } from '../controllers/authControllers';
 import passport from 'passport';
 
@@ -19,7 +19,7 @@ router.get(
     failureRedirect: '/login',
     session: true,
   }),
-  (req, res) => {
+  (req: Request, res: Response) => {
     // Successful authentication, redirect home or send user data
     res.redirect('/');
   },
