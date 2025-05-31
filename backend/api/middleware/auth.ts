@@ -1,6 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 
+declare global {
+  namespace Express {
+    interface User extends User {} // Extend with your User model
+  }
+}
+
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     return next();
