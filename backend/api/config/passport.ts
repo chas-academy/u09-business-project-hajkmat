@@ -40,7 +40,7 @@ passport.use(
 );
 
 // Serialize user to store in session
-passport.serializeUser((user: IUser, done: (err: Error | null, id?: string) => void) => {
+passport.serializeUser((user: any, done) => {
   done(null, user.id);
 });
 
