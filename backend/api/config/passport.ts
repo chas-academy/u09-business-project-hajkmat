@@ -2,6 +2,15 @@ import passport, { Profile } from 'passport';
 import { Strategy as GoogleStrategy, VerifyCallback } from 'passport-google-oauth20';
 import User, { IUser } from '../models/user';
 
+// Type-safe environment variables
+declare const process: {
+  env: {
+    GOOGLE_CLIENT_ID?: string;
+    GOOGLE_CLIENT_SECRET?: string;
+    [key: string]: string | undefined;
+  };
+};
+
 // Validate environment variables
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   console.error('Missing Google OAuth credentials in environment variables');
@@ -19,7 +28,7 @@ passport.use(
         // Check if user already exists in the database
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
-          return done(null, user);
+          return done(null, user.toObject() as any);
         } else {
           // If not, create a new user
           // Safely access email if available
@@ -30,7 +39,7 @@ passport.use(
             displayName: profile.displayName,
             email: email,
           }).save();
-          return done(null, user);
+          return done(null, user.toObject() as any);
         }
       } catch (err) {
         return done(err as Error, undefined);
@@ -40,18 +49,19 @@ passport.use(
 );
 
 // Serialize user to store in session
-passport.serializeUser((user: any, done) => {
+passport.serializeUser((user: any, done: (err: any, id?: any) => void) => {
   done(null, user.id);
 });
 
 // Deserialize user from session
-passport.deserializeUser(async (id: string, done) => {
+passport.deserializeUser(async (id: string, done: (err: any, user?: any) => void) => {
   try {
     const user = await User.findById(id);
     if (!user) {
       return done(new Error('User not found'), undefined);
     }
-    return done(null, user);
+    // Convert to plain object to resolve type conflicts
+    return done(null, user.toObject() as any);
   } catch (err) {
     return done(err as Error, undefined);
   }

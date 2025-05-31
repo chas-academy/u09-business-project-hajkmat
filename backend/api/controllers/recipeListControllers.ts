@@ -7,7 +7,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Create a new recipe list
-export const createRecipeList = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const createRecipeList = async (req: Request, res: Response): Promise<void> => {
   const { name } = req.body;
 
   if (!req.user) {
@@ -28,7 +28,7 @@ export const createRecipeList = async (req: AuthenticatedRequest, res: Response)
 };
 
 // Get all recipe lists for a user
-export const getRecipeLists = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const getRecipeLists = async (req: Request, res: Response): Promise<void> => {
   if (!req.user) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
@@ -46,7 +46,7 @@ export const getRecipeLists = async (req: AuthenticatedRequest, res: Response): 
 };
 
 // Delete a recipe list
-export const deleteRecipeList = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+export const deleteRecipeList = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
 
   if (!req.user) {
