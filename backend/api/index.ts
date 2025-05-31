@@ -36,11 +36,15 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ error: 'Server error' });
 });
 
-connectDB();
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+connectDB()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to start server:', err);
+  });
 
 export default app;
 module.exports = app;
