@@ -1,9 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
+import { IUser } from '../models/user';
 
 declare global {
   namespace Express {
-    interface User extends User {} // Extend with your User model
+    // Use IUser properties to define User
+    interface User extends Omit<IUser, 'id'> {
+      id: string;
+      googleId: string;
+      email: string;
+      name: string;
+      recipeLists: any[];
+    }
   }
 }
 

@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
 import RecipeList from '../models/recipeList';
-import { User } from '../types/auth';
 
 // Define custom request interface with user property
 interface AuthenticatedRequest extends Request {
-  user?: User;
+  user?: Express.User;
 }
 
 // Create a new recipe list
