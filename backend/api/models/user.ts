@@ -1,18 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
-
-interface IRecipe {
-  recipeId: string;
-  name: string;
-}
-
-export interface IUser extends Document {
-  id: string;
-  googleId: string;
-  displayName: string;
-  email: string;
-  name: string;
-  recipeLists: IRecipe[];
-}
+import mongoose, { Schema } from 'mongoose';
+import { IUser } from '../types/user';
 
 const RecipeSchema: Schema = new Schema({
   recipeId: { type: String, required: true },

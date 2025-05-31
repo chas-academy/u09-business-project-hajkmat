@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import RecipeList from '../models/recipeList';
 
-// Define custom request interface with user property
-interface AuthenticatedRequest extends Request {
-  user?: Express.User;
-}
-
 // Create a new recipe list
 export const createRecipeList = async (req: Request, res: Response): Promise<void> => {
   const { name } = req.body;

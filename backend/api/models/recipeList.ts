@@ -1,14 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-interface IRecipe {
-  recipeId: string;
-  name: string;
-}
-
-interface IRecipeList extends Document {
-  userId: string;
-  recipes: IRecipe[];
-}
+import mongoose, { Schema } from 'mongoose';
+import { IRecipeList } from '../types/recipe';
 
 const RecipeSchema: Schema = new Schema({
   userId: { type: String, required: true },
