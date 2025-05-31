@@ -2,10 +2,10 @@ import { User } from './auth';
 import { Recipe } from './recipe';
 
 declare global {
-  namespace Express {
-    interface Request {
-      user?: User;
-    }
+  export interface User {
+    id: string;
+    displayName: string;
+    email: string;
   }
 }
 
