@@ -1,10 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "dist/api/index.js",
+  "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node dist/api/index.js",
+    "start": "node dist/index.js",
     "build": "tsc -p tsconfig.build.json",
     "serve": "node dist/index.js",
     "dev": "nodemon api/index.ts",
