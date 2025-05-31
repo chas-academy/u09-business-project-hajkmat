@@ -5,7 +5,6 @@ import User, { IUser } from '../models/user';
 // Validate environment variables
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   console.error('Missing Google OAuth credentials in environment variables');
-  process.exit(1);
 }
 
 passport.use(
