@@ -7,7 +7,7 @@ describe('API Endpoints', () => {
       const response = await request(index).get('/');
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message');
-      expect(response.body.message).toBe('API is running');
+      expect(response.body.message).toBe('HAJKMAT');
     });
   });
 
