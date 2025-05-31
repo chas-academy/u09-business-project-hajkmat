@@ -4,17 +4,21 @@ import User from '../models/user';
 
 // Login function
 export const login = (req: Request, res: Response) => {
-  passport.authenticate('google', { session: false }, (err, user, info) => {
-    if (err || !user) {
-      return res.status(400).json({ error: info.message });
-    }
-    req.login(user, { session: false }, (err) => {
-      if (err) {
-        return res.status(400).json({ error: 'Login failed' });
+  passport.authenticate(
+    'google',
+    { session: false },
+    (err: Error | null, user: any, info: { message: string }) => {
+      if (err || !user) {
+        return res.status(400).json({ error: info?.message || 'Authentication failed' });
       }
-      return res.status(200).json({ user });
-    });
-  })(req, res);
+      req.login(user, { session: false }, (err: Error | null) => {
+        if (err) {
+          return res.status(400).json({ error: 'Login failed' });
+        }
+        return res.status(200).json({ user });
+      });
+    },
+  )(req, res);
 };
 
 // Register function (if needed)
@@ -35,7 +39,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 // Logout function
 export const logout = (req: Request, res: Response) => {
-  req.logout((err) => {
+  req.logout((err: Error | null) => {
     if (err) {
       return res.status(400).json({ error: 'Logout failed' });
     }

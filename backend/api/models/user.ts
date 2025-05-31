@@ -6,6 +6,7 @@ interface IRecipe {
 }
 
 export interface IUser extends Document {
+  id: string;
   googleId: string;
   email: string;
   name: string;
@@ -22,6 +23,17 @@ const UserSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   recipeLists: [RecipeSchema],
+});
+
+UserSchema.set('timestamps', true);
+
+UserSchema.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
+  transform: (_, ret) => {
+    delete ret._id;
+    return ret;
+  },
 });
 
 const User = mongoose.model<IUser>('User', UserSchema);

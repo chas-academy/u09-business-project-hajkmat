@@ -5,7 +5,7 @@ dotenv.config();
 
 const MONGODB_URI =
   process.env.NODE_ENV === 'production'
-    ? process.env.MONGODB_URI_PROD
+    ? process.env.MONGODB_URI_PROD || ''
     : process.env.MONGODB_URI_LOCAL || 'mongodb://localhost:27017/hajkmat';
 
 /**
@@ -21,7 +21,7 @@ const connectDB = async (): Promise<typeof mongoose> => {
     const conn = await mongoose.connect(MONGODB_URI);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(
       `Error connecting to MongoDB: ${error instanceof Error ? error.message : String(error)}`,
     );

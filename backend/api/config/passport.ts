@@ -1,5 +1,5 @@
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import passport, { Profile } from 'passport';
+import { Strategy as GoogleStrategy, VerifyCallback } from 'passport-google-oauth20';
 import User, { IUser } from '../models/user';
 
 // Validate environment variables
@@ -14,7 +14,7 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       callbackURL: '/auth/google/callback',
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
       try {
         // Check if user already exists in the database
         let user = await User.findOne({ googleId: profile.id });
@@ -40,10 +40,8 @@ passport.use(
 );
 
 // Serialize user to store in session
-passport.serializeUser((user, done) => {
-  // Use type assertion to tell TypeScript this is your IUser type
-  const userWithId = user as IUser;
-  done(null, userWithId.id);
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
 });
 
 // Deserialize user from session
