@@ -25,8 +25,7 @@ const connectDB = async (): Promise<typeof mongoose> => {
     console.error(
       `Error connecting to MongoDB: ${error instanceof Error ? error.message : String(error)}`,
     );
-    process.exit(1);
+    throw error;
   }
 };
-
 export default connectDB;
