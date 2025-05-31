@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
-# Install TypeScript explicitly first
+# Install TypeScript globally
 npm install -g typescript
-# Install all dependencies including dev dependencies
+
+# Install all dependencies
 npm ci
-# Print TypeScript version to verify it's installed
+
+# Install necessary type definitions
+npm install --save-dev @types/node @types/express @types/passport @types/passport-google-oauth20 @types/cors @types/jest @types/supertest
+
+# Print TypeScript version to verify
 tsc --version
-# Run the build
-npm run build
+
+# Run the build with skipLibCheck to ignore issues in node_modules
+./node_modules/.bin/tsc --skipLibCheck
