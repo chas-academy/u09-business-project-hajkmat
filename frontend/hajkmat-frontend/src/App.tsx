@@ -1,13 +1,15 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
 import './App.css';
 
 function App() {
   return (
     <Router>
-      <div className="app">
+      <div className="flex flex-col min-h-screen">
         <Header />
-        {/* Your page content goes here */}
+        <main className="flex-grow">{/* Your page content goes here */}</main>
+        <Footer />
       </div>
     </Router>
   );
