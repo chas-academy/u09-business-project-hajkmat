@@ -17,7 +17,7 @@ const Checkbox = ({
   };
 
   return (
-    <div className={`flex items-start ${className}`}>
+    <div className={`flex my-4 mx-4 items-start ${className}`}>
       <div className="flex items-center h-5">
         <input
           id={id}
