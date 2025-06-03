@@ -38,3 +38,16 @@ export interface ButtonProps {
   fullWidth?: boolean;
   size?: 'small' | 'medium' | 'large';
 }
+
+export interface ImageProps {
+  src?: string; // Make src optional by adding ?
+  alt: string;
+  width?: number | string;
+  height?: number | string;
+  className?: string;
+  objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down';
+  rounded?: boolean | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  aspectRatio?: '1/1' | '4/3' | '16/9' | '3/2' | 'auto';
+  fallbackSrc?: string;
+  lazy?: boolean;
+}

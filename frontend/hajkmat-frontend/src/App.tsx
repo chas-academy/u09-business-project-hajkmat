@@ -6,6 +6,7 @@ import TitleUpdater from './components/TitleUpdater';
 import TextInput from './components/formcomponents/TextInput';
 import Checkbox from './components/formcomponents/Checkbox';
 import Button from './components/component/Button';
+import Image from './components/component/Image';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Header />
         <main className="flex-grow">
           {/* Your page content goes here */}
+          <Image alt="Profile" rounded="full" width={100} height={100} />
           <form>
             <TextInput
               id="recept"
