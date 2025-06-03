@@ -3,10 +3,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import TitleUpdater from './components/TitleUpdater';
+import TextInput from './components/formcomponents/TextInput';
 import Checkbox from './components/formcomponents/Checkbox';
 import './App.css';
 
 function App() {
+  const [receptlist, setReceptlist] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   return (
     <Router>
@@ -16,6 +18,13 @@ function App() {
         <main className="flex-grow">
           {/* Your page content goes here */}
           <form>
+            <TextInput
+              id="recept"
+              label="Recept"
+              value={receptlist}
+              onChange={setReceptlist}
+              placeholder="Ange namn på din recept lista:"
+            />
             <Checkbox
               id="terms"
               label="Jag godkänner villkoren"
