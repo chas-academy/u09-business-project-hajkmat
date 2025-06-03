@@ -18,11 +18,11 @@ const Button = ({
     danger: 'bg-red-600 hover:bg-red-700 text-white',
   }[variant];
 
-  // Determine button size
+  // Determine button size with responsive behavior
   const sizeStyles = {
-    small: 'py-1 px-3 text-sm',
-    medium: 'py-2 px-4',
-    large: 'py-3 px-5 text-lg',
+    small: 'py-0.5 px-2 text-xs md:py-1 md:px-3 md:text-sm',
+    medium: 'py-1 px-3 text-sm md:py-2 md:px-4 md:text-base',
+    large: 'py-2 px-4 text-base md:py-3 md:px-5 md:text-lg',
   }[size];
 
   // Full width class
@@ -37,10 +37,10 @@ const Button = ({
         ${variantStyles}
         ${sizeStyles}
         ${widthClass}
-        rounded-md font-medium
+        rounded-xl font-medium
         transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
         disabled:opacity-50 disabled:cursor-not-allowed
-        my-4 mx-4
+        my-2 mx-2 md:my-4 md:mx-4
         ${className}
       `}
     >
