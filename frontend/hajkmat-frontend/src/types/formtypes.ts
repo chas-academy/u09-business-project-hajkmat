@@ -26,3 +26,15 @@ export interface TextInputProps {
   inputClassName?: string;
   helpText?: string;
 }
+
+// Is the general button for the project
+export interface ButtonProps {
+  type?: 'button' | 'submit' | 'reset';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
+  fullWidth?: boolean;
+  size?: 'small' | 'medium' | 'large';
+}

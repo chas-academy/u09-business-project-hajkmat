@@ -5,6 +5,7 @@ import Footer from './components/Footer/Footer';
 import TitleUpdater from './components/TitleUpdater';
 import TextInput from './components/formcomponents/TextInput';
 import Checkbox from './components/formcomponents/Checkbox';
+import Button from './components/component/Button';
 import './App.css';
 
 function App() {
@@ -32,6 +33,18 @@ function App() {
               onChange={setIsChecked}
             />
           </form>
+
+          <Button variant="primary">Save</Button>
+          <Button variant="secondary" size="small">
+            Cancel
+          </Button>
+          <Button variant="outline" size="medium">
+            Back
+          </Button>
+          <Button variant="danger" size="large">
+            Delete
+          </Button>
+          <Button onClick={() => alert('Clicked!')}>Click Me</Button>
         </main>
         <Footer />
       </div>
