@@ -16,13 +16,16 @@ const app: Express = express();
 const port: number = parseInt(process.env.PORT || '3000', 10);
 
 // Middleware
-app.use(express.json());
 app.use(
   cors({
     origin: ['http://localhost:5173', 'https://hajkmat.netlify.app'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
   }),
 );
+app.use(express.json());
 
 // Session middleware - MUST come before passport
 app.use(
