@@ -24,7 +24,12 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    // Extract user data
+    // Check if user exists
+    if (!req.user) {
+      return res.redirect('https://hajkmat.netlify.app/login?error=no_user');
+    }
+
+    // Now TypeScript knows req.user exists
     const user = req.user;
 
     // Create JWT token with user data

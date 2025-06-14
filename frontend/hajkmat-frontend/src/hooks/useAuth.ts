@@ -13,13 +13,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const handleTokenAuthentication = async (token: string) => {
+    try {
+      // Store token in localStorage
+      localStorage.setItem('auth_token', token);
+
+      // Verify and update auth state
+      await checkAuthStatus();
+      return true;
+    } catch (err) {
+      console.error('Token authentication failed:', err);
+      return false;
+    }
+  };
   // Check authentication status
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Use development bypass in dev mode if needed
+      // Keep the dev bypass code unchanged
       if (import.meta.env.DEV && window.localStorage.getItem('dev_auth_bypass')) {
         const devUser = JSON.parse(
           localStorage.getItem('dev_user') || '{"id":"dev-user","displayName":"Dev User"}',
@@ -30,8 +43,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       }
 
-      const response = await fetch(`${API_URL}/auth/check`, {
-        credentials: 'include', // Important for cookies
+      // Check for token instead of session cookie
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        setUser(null);
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
+      // Verify token with backend
+      const response = await fetch(`${API_URL}/auth/verify-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
       });
 
       if (response.ok) {
@@ -39,6 +64,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(data.user);
         setIsAuthenticated(true);
       } else {
+        // Token invalid, clean up
+        localStorage.removeItem('auth_token');
         setUser(null);
         setIsAuthenticated(false);
       }
@@ -78,30 +105,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setLoading(true);
 
-      // Clear dev bypass if used
-      if (import.meta.env.DEV && window.localStorage.getItem('dev_auth_bypass')) {
+      // Remove token instead of clearing cookies
+      localStorage.removeItem('auth_token');
+
+      // Keep existing dev code
+      if (import.meta.env.DEV) {
         window.localStorage.removeItem('dev_auth_bypass');
         window.localStorage.removeItem('dev_user');
-        setIsAuthenticated(false);
-        setUser(null);
-        setLoading(false);
-        return;
       }
 
-      // Call logout API
-      const response = await fetch(`${API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      if (response.ok) {
-        setIsAuthenticated(false);
-        setUser(null);
-      } else {
-        setError('Failed to logout');
-      }
+      setUser(null);
+      setIsAuthenticated(false);
+      return true;
     } catch (err) {
       console.error('Logout failed:', err);
       setError('Failed to logout');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -121,6 +140,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     login,
     logout,
     checkAuthStatus,
+    handleTokenAuthentication,
   };
 
   // Provide the auth context to children
