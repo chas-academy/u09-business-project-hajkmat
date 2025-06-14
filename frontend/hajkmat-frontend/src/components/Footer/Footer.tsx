@@ -1,15 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react'; // Add this if you need local state for demo
+import { useAuth } from '../../hooks/useAuth';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  // In a real app, you'd get this from context/props/global state
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // For demonstration purposes only
-  const toggleLogin = () => {
-    setIsLoggedIn(!isLoggedIn);
-  };
+  const { isAuthenticated } = useAuth();
 
   return (
     <footer className="bg-gray-100 py-4 md:py-8">
@@ -24,10 +18,6 @@ const Footer = () => {
               Din guide till att planera mat för hajk och friluftsliv baserat på allergier.
             </p>
           </div>
-          {/* Demo button to toggle login state - remove in production */}
-          <button onClick={toggleLogin} style={{ marginLeft: '10px' }}>
-            {isLoggedIn ? 'Logga ut' : 'Logga in'}
-          </button>
 
           {/* Quick links */}
           <div className="mb-3 md:mb-0">
@@ -40,14 +30,14 @@ const Footer = () => {
                   Hem
                 </Link>
               </li>
-              {isLoggedIn && (
+              {isAuthenticated && (
                 <li className="mb-0 md:mb-1">
                   <Link to="/profile" className="text-sm text-gray-600 hover:text-blue-600">
                     Profil
                   </Link>
                 </li>
               )}
-              {isLoggedIn && (
+              {isAuthenticated && (
                 <li className="mb-0 md:mb-1">
                   <Link to="/lists" className="text-sm text-gray-600 hover:text-blue-600">
                     Listor

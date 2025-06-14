@@ -1,38 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDocumentTitle } from '../../../hooks/useDocumentTitle';
+import { useAuth } from '../../../hooks/useAuth';
 
 const Dashboard: React.FC = () => {
   useDocumentTitle('Dashboard | Hajkmat');
-  const [userName, setUserName] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Fetch user data on component mount
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        // Fetch user data from API
-        const response = await fetch('/api/auth/check', {
-          credentials: 'include', // Important for cookies
-        });
+  // Use the auth context instead of making a separate API call
+  const { user, loading } = useAuth();
 
-        if (response.ok) {
-          const userData = await response.json();
-          setUserName(userData.user?.name || 'användare');
-        } else {
-          setUserName('användare');
-        }
-      } catch (error) {
-        console.error('Failed to fetch user data:', error);
-        setUserName('användare');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Get user name from the auth context
+  const userName = user?.displayName || 'användare';
 
-    fetchUserData();
-  }, []);
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

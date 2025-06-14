@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // This would typically come from a context or auth service
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated, user, loading, login, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // For demonstration purposes only
-  const toggleLogin = () => {
-    setIsLoggedIn(!isLoggedIn);
+  const handleAuthAction = () => {
+    if (isAuthenticated) {
+      logout();
+    } else {
+      login();
+    }
   };
 
   return (
@@ -23,11 +27,6 @@ const Header = () => {
             <span className="text-xl font-bold text-gray-800">Hajkmat</span>
           </Link>
         </div>
-
-        {/* Demo button to toggle login state - remove in production */}
-        <button onClick={toggleLogin} style={{ marginLeft: '10px' }}>
-          {isLoggedIn ? 'Logga ut' : 'Logga in'}
-        </button>
 
         <button
           className="md:hidden block p-2 focus:outline-none"
@@ -63,14 +62,14 @@ const Header = () => {
                 Hem
               </Link>
             </li>
-            {isLoggedIn && (
+            {isAuthenticated && (
               <li className="px-6 py-2 md:py-0">
                 <Link to="/profile" className="text-gray-800 hover:text-blue-600">
                   Profil
                 </Link>
               </li>
             )}
-            {isLoggedIn && (
+            {isAuthenticated && (
               <li className="px-6 py-2 md:py-0">
                 <Link to="/lists" className="text-gray-800 hover:text-blue-600">
                   Listor
@@ -81,6 +80,18 @@ const Header = () => {
               <Link to="/about" className="text-gray-800 hover:text-blue-600">
                 Om Hajkmat
               </Link>
+            </li>
+            {/* Add login/logout button here */}
+            <li className="px-6 py-2 md:py-0 ml-auto">
+              <button
+                onClick={handleAuthAction}
+                disabled={loading}
+                className={`text-gray-800 hover:text-blue-600 ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading ? 'Laddar...' : isAuthenticated ? 'Logga ut' : 'Logga in'}
+              </button>
             </li>
           </ul>
         </nav>

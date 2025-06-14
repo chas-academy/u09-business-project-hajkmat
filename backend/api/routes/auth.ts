@@ -52,4 +52,14 @@ router.post('/login', login);
 // Registration route
 router.post('/register', register);
 
+// Logout route
+router.post('/logout', (req: Request, res: Response) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error during logout' });
+    }
+    res.status(200).json({ success: true });
+  });
+});
+
 export default router;
