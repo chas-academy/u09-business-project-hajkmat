@@ -7,7 +7,6 @@ export const ProtectedRoute: React.FC = () => {
   const redirectAttempted = sessionStorage.getItem('redirectAttempted') === 'true';
 
   useEffect(() => {
-    t;
     if (!loading && !isAuthenticated && !redirectAttempted) {
       sessionStorage.setItem('redirectAttempted', 'true');
     }
