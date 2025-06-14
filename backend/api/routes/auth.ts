@@ -1,7 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { login, register } from '../controllers/authControllers';
 import passport from 'passport';
+import cors from 'cors';
 
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === 'production' ? 'https://hajkmat.netlify.app' : 'http://localhost:5173',
+  credentials: true,
+};
 const router = Router();
 
 // Google OAuth login route
@@ -32,7 +38,7 @@ router.get(
 );
 
 // Add an endpoint to check authentication status
-router.get('/check', (req: Request, res: Response) => {
+router.get('/check', cors(corsOptions), (req: Request, res: Response) => {
   if (req.isAuthenticated()) {
     res.status(200).json({
       isAuthenticated: true,
