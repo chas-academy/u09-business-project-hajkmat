@@ -24,27 +24,33 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    // Check if user exists
     if (!req.user) {
       return res.redirect('https://hajkmat.netlify.app/login?error=no_user');
     }
 
-    // Now TypeScript knows req.user exists
-    const user = req.user;
+    try {
+      // Create JWT token
+      const token = jwt.sign(
+        {
+          id: req.user.id || (req.user as any)._id,
+          displayName: req.user.displayName,
+          email: (req.user as any).emails?.[0]?.value || (req.user as any).email,
+          picture: (req.user as any).photos?.[0]?.value || (req.user as any).picture,
+        },
+        process.env.JWT_SECRET || 'your-jwt-secret',
+        { expiresIn: '24h' },
+      );
 
-    // Create JWT token with user data
-    const token = jwt.sign(
-      {
-        id: user.id,
-        displayName: user.displayName,
-        email: user.email,
-      },
-      process.env.JWT_SECRET || 'your-jwt-secret',
-      { expiresIn: '24h' },
-    );
+      // Log for debugging
+      console.log('Generated token for user:', req.user.displayName);
 
-    // Redirect with token to frontend
-    res.redirect(`https://hajkmat.netlify.app/auth-callback?token=${token}`);
+      // IMPORTANT: Make sure this URL is correct
+      const frontendUrl = process.env.FRONTEND_URL || 'https://hajkmat.netlify.app';
+      res.redirect(`${frontendUrl}/auth-callback?token=${token}`);
+    } catch (error) {
+      console.error('Token generation error:', error);
+      res.redirect('https://hajkmat.netlify.app/login?error=token_error');
+    }
   },
 );
 // Endpoint to verify token

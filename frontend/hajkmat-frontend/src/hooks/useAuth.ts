@@ -15,12 +15,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const handleTokenAuthentication = async (token: string) => {
     try {
-      // Store token in localStorage
+      console.log('handleTokenAuthentication called with token');
+
+      // Store token (redundant but ensures it's set)
       localStorage.setItem('auth_token', token);
 
-      // Verify and update auth state
+      // Verify token and update state
       await checkAuthStatus();
-      return true;
+
+      // Check if it worked
+      console.log('Auth state after token processing:', {
+        isAuthenticated,
+        user: user?.displayName || 'No user',
+      });
+
+      return isAuthenticated;
     } catch (err) {
       console.error('Token authentication failed:', err);
       return false;
