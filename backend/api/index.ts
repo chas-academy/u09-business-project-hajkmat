@@ -15,17 +15,29 @@ dotenv.config();
 const app: Express = express();
 const port: number = parseInt(process.env.PORT || '3000', 10);
 
-// Middleware
+// CORS configuration
+const allowedOrigins = ['https://hajkmat.netlify.app', 'http://localhost:5173'];
+
+// Apply CORS
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'https://hajkmat.netlify.app'],
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   }),
 );
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Session middleware - MUST come before passport
 app.use(
@@ -39,6 +51,7 @@ app.use(
     }),
     cookie: {
       secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   }),
