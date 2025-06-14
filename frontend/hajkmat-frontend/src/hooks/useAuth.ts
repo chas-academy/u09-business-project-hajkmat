@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import React from 'react';
 import { User, AuthContextType } from '../types/authtypes';
+import API_URL from '../config/api';
 
 // Create the context with a default undefined value AND explicit type
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,7 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       }
 
-      const response = await fetch('/api/auth/check', {
+      const response = await fetch(`${API_URL}/auth/check`, {
         credentials: 'include', // Important for cookies
       });
 
@@ -69,7 +70,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     // For production, redirect to Google OAuth
-    window.location.href = '/api/auth/google';
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   // Handle logout
@@ -88,11 +89,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Call logout API
-      const response = await fetch('/api/auth/logout', {
+      const response = await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });
-
       if (response.ok) {
         setIsAuthenticated(false);
         setUser(null);
