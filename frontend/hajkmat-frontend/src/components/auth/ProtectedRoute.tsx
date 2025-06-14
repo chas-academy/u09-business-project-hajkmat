@@ -29,7 +29,7 @@ export const ProtectedRoute: React.FC = () => {
   // Handle unauthenticated state
   if (!isAuthenticated) {
     if (!redirectAttempted) {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/login" replace />;
     }
 
     // Show login message rather than redirecting again

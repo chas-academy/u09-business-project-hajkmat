@@ -2,9 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import TitleUpdater from './components/TitleUpdater';
-import Dashboard from './components/Main/Home/Dashboard';
+import Home from './components/Main/Home/Home';
+import Login from './components/auth/Login';
+import ProfilePage from './components/Main/ProfilePage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { RootRoute } from './components/RootRoute';
 import { AuthProvider } from './hooks/useAuth';
 import AuthCallback from './components/auth/AuthCallback';
 import './App.css';
@@ -19,12 +20,12 @@ function App() {
           <main className="flex-grow">
             {/* Your page content goes here */}
             <Routes>
-              {/* Root route conditionally renders Home or redirects to Dashboard */}
-              <Route path="/" element={<RootRoute />} />
+              <Route path="/" element={<Home />} /> {/* Home is now accessible to everyone */}
+              <Route path="/login" element={<Login />} /> {/* New login route */}
               <Route path="/auth-callback" element={<AuthCallback />} />
               {/* Protected routes */}
               <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 {/* Add more protected routes here */}
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

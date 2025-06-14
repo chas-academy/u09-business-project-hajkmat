@@ -16,13 +16,9 @@ const AuthCallback: React.FC = () => {
       if (token) {
         // Store token and process authentication
         const success = await handleTokenAuthentication(token);
-        if (success) {
-          navigate('/dashboard');
-        } else {
-          navigate('/?error=auth_failed');
-        }
+        navigate(success ? '/' : '/login');
       } else {
-        navigate('/');
+        navigate('/login');
       }
     };
 

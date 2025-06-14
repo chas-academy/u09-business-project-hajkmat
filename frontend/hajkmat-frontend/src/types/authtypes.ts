@@ -3,6 +3,7 @@ export interface User {
   id: string;
   displayName: string;
   email?: string;
+  picture?: string;
 }
 
 // Define authentication context interface
