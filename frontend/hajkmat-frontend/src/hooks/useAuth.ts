@@ -32,18 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      // Keep the dev bypass code unchanged
-      if (import.meta.env.DEV && window.localStorage.getItem('dev_auth_bypass')) {
-        const devUser = JSON.parse(
-          localStorage.getItem('dev_user') || '{"id":"dev-user","displayName":"Dev User"}',
-        );
-        setUser(devUser);
-        setIsAuthenticated(true);
-        setLoading(false);
-        return;
-      }
-
-      // Check for token instead of session cookie
+      // Check for token
       const token = localStorage.getItem('auth_token');
       if (!token) {
         setUser(null);
@@ -81,21 +70,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Handle login - redirects to Google OAuth
   const login = () => {
-    // For dev environment, you can use bypass
-    if (import.meta.env.DEV && confirm('Use dev login bypass?')) {
-      window.localStorage.setItem('dev_auth_bypass', 'true');
-      window.localStorage.setItem(
-        'dev_user',
-        JSON.stringify({
-          id: 'dev-user',
-          displayName: 'Dev User',
-          email: 'dev@example.com',
-        }),
-      );
-      checkAuthStatus();
-      return;
-    }
-
     // For production, redirect to Google OAuth
     window.location.href = `${API_URL}/auth/google`;
   };
@@ -108,14 +82,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Remove token instead of clearing cookies
       localStorage.removeItem('auth_token');
 
-      // Keep existing dev code
-      if (import.meta.env.DEV) {
-        window.localStorage.removeItem('dev_auth_bypass');
-        window.localStorage.removeItem('dev_user');
-      }
-
-      setUser(null);
-      setIsAuthenticated(false);
       return true;
     } catch (err) {
       console.error('Logout failed:', err);
