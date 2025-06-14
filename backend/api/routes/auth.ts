@@ -20,15 +20,46 @@ router.get(
     session: true,
   }),
   (req: Request, res: Response) => {
-    // Successful authentication, redirect home or send user data
-    res.redirect('/');
+    // Successful authentication
+    // For development - adjust frontend URL in production
+    const frontendUrl =
+      process.env.NODE_ENV === 'production'
+        ? 'https://hajkmat.netlify.app'
+        : 'http://localhost:5173';
+
+    res.redirect(`${frontendUrl}/dashboard`);
   },
 );
+
+// Add an endpoint to check authentication status
+router.get('/check', (req: Request, res: Response) => {
+  if (req.isAuthenticated()) {
+    res.status(200).json({
+      isAuthenticated: true,
+      user: req.user,
+    });
+  } else {
+    res.status(401).json({
+      isAuthenticated: false,
+      message: 'Not authenticated',
+    });
+  }
+});
 
 // Login route
 router.post('/login', login);
 
 // Registration route
 router.post('/register', register);
+
+// Logout route
+router.post('/logout', (req: Request, res: Response) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error during logout' });
+    }
+    res.status(200).json({ success: true });
+  });
+});
 
 export default router;

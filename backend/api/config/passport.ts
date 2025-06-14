@@ -3,14 +3,6 @@ import { Strategy as GoogleStrategy, VerifyCallback } from 'passport-google-oaut
 import User from '../models/user';
 import { userToObject } from '../utils/auth';
 
-function createNewUser(profile: Profile) {
-  return new User({
-    googleId: profile.id,
-    displayName: profile.displayName,
-    email: profile.emails && profile.emails[0] ? profile.emails[0].value : '',
-  }).save();
-}
-
 // Type-safe environment variables
 declare const process: {
   env: {
@@ -30,14 +22,15 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: '/auth/google/callback',
+      callbackURL: 'http://localhost:5173/api/auth/google/callback',
+      scope: ['profile', 'email'],
     },
     async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
       try {
         // Check if user already exists in the database
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
-          return done(null, userToObject(user || (await createNewUser(profile))));
+          return done(null, userToObject(user));
         } else {
           // If not, create a new user
           // Safely access email if available
@@ -46,9 +39,10 @@ passport.use(
           user = await new User({
             googleId: profile.id,
             displayName: profile.displayName,
+            name: profile.displayName,
             email: email,
           }).save();
-          return done(null, userToObject(user || (await createNewUser(profile))));
+          return done(null, userToObject(user));
         }
       } catch (err) {
         return done(err as Error, undefined);
