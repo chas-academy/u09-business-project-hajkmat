@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // This would typically come from a context or auth service
-  const { isAuthenticated, user, loading, login, logout } = useAuth();
+  const { isAuthenticated, loading, login, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

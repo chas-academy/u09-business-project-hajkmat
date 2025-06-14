@@ -3,14 +3,6 @@ import { Strategy as GoogleStrategy, VerifyCallback } from 'passport-google-oaut
 import User from '../models/user';
 import { userToObject } from '../utils/auth';
 
-function createNewUser(profile: Profile) {
-  return new User({
-    googleId: profile.id,
-    displayName: profile.displayName,
-    email: profile.emails && profile.emails[0] ? profile.emails[0].value : '',
-  }).save();
-}
-
 // Type-safe environment variables
 declare const process: {
   env: {
