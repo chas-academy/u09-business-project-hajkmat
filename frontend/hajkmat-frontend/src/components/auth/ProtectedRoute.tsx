@@ -1,17 +1,25 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import React from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 export const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+  const [accessDecision, setAccessDecision] = useState<boolean | null>(null);
 
-  // Debug what's happening
-  console.log('ProtectedRoute state:', { isAuthenticated, loading });
+  // Make authentication decision only once per location change or auth state change
+  useEffect(() => {
+    if (!loading) {
+      // Only make decision once loading is complete
+      const devBypassActive =
+        import.meta.env.DEV && window.localStorage.getItem('dev_auth_bypass') === 'true';
 
-  // For development bypass: check localStorage directly as a fallback
-  const devBypassActive = import.meta.env.DEV && window.localStorage.getItem('dev_auth_bypass');
+      setAccessDecision(isAuthenticated || devBypassActive);
+    }
+  }, [isAuthenticated, loading, location.pathname]);
 
-  if (loading) {
+  // Show loading state
+  if (loading || accessDecision === null) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -19,14 +27,5 @@ export const ProtectedRoute: React.FC = () => {
     );
   }
 
-  // Allow access if authenticated through context OR dev bypass is active
-  const allowAccess = isAuthenticated || devBypassActive;
-
-  console.log('ProtectedRoute access decision:', {
-    allowAccess,
-    isAuthenticated,
-    devBypassActive,
-  });
-
-  return allowAccess ? <Outlet /> : <Navigate to="/" />;
+  return accessDecision ? <Outlet /> : <Navigate to="/" replace />;
 };
