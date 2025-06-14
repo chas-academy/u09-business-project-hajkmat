@@ -46,12 +46,15 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/hajkmat',
+      mongoUrl:
+        process.env.MONGODB_URI_PROD ||
+        process.env.MONGODB_URI ||
+        'mongodb://localhost:27017/hajkmat',
       collectionName: 'sessions',
     }),
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   }),

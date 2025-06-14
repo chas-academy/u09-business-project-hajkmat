@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { login, register } from '../controllers/authControllers';
 import passport from 'passport';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 
 const corsOptions = {
   origin:
@@ -21,21 +22,44 @@ router.get(
 // Google OAuth callback route
 router.get(
   '/google/callback',
-  passport.authenticate('google', {
-    failureRedirect: '/login',
-    session: true,
-  }),
-  (req: Request, res: Response) => {
-    // Successful authentication
-    // For development - adjust frontend URL in production
-    const frontendUrl =
-      process.env.NODE_ENV === 'production'
-        ? 'https://hajkmat.netlify.app'
-        : 'http://localhost:5173';
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  (req, res) => {
+    // Extract user data
+    const user = req.user;
 
-    res.redirect(`${frontendUrl}/dashboard`);
+    // Create JWT token with user data
+    const token = jwt.sign(
+      {
+        id: user.id,
+        displayName: user.displayName,
+        email: user.email,
+      },
+      process.env.JWT_SECRET || 'your-jwt-secret',
+      { expiresIn: '24h' },
+    );
+
+    // Redirect with token to frontend
+    res.redirect(`https://hajkmat.netlify.app/auth-callback?token=${token}`);
   },
 );
+// Endpoint to verify token
+router.post('/verify-token', (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  if (!token) {
+    res.status(401).json({ isAuthenticated: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+    res.status(200).json({
+      isAuthenticated: true,
+      user: decoded,
+    });
+  } catch (err) {
+    res.status(401).json({ isAuthenticated: false });
+  }
+});
 
 // Add an endpoint to check authentication status
 router.get('/check', cors(corsOptions), (req: Request, res: Response) => {
