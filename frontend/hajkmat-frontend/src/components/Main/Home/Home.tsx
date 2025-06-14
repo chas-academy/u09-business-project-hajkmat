@@ -1,19 +1,44 @@
 import { useDocumentTitle } from '../../../hooks/useDocumentTitle';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../component/Button';
 
 const Home = () => {
   useDocumentTitle('Matplaneraren');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const handleGoogleLogin = async () => {
+  useEffect(() => {
+    // Check if user is already authenticated via session cookie
+    const checkAuth = async () => {
+      try {
+        // In development, you can bypass the real authentication check
+        if (import.meta.env.DEV && !window.localStorage.getItem('dev_auth_bypass')) {
+          console.log('Development mode: Skipping real authentication check');
+          return;
+        }
+
+        const response = await fetch('/api/auth/check', {
+          credentials: 'include', // Important for cookies
+        });
+        if (response.ok) {
+          // User is authenticated, redirect to dashboard
+          navigate('/dashboard');
+        }
+        // 401 responses are expected when not logged in - no need to handle them
+      } catch (error) {
+        // Only log actual network errors, not authentication errors
+        console.error('Authentication check failed (network error):', error);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  const handleGoogleLogin = () => {
     setIsLoading(true);
-    try {
-      window.location.href = '/api/auth/google';
-    } catch (error) {
-      console.error('Login failed:', error);
-      setIsLoading(false);
-    }
+    // This will redirect the browser to Google's auth page
+    window.location.href = '/api/auth/google';
   };
 
   return (

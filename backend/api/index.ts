@@ -4,6 +4,8 @@ import connectDB from './database/db';
 import routes from './routes/routes';
 import cors from 'cors';
 import passport from 'passport';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import './config/passport';
 
 // Load environment variables
@@ -15,8 +17,33 @@ const port: number = parseInt(process.env.PORT || '3000', 10);
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'https://hajkmat.netlify.app'],
+    credentials: true,
+  }),
+);
+
+// Session middleware - MUST come before passport
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/hajkmat',
+      collectionName: 'sessions',
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  }),
+);
+
+// Passport middleware
 app.use(passport.initialize());
+app.use(passport.session());
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
