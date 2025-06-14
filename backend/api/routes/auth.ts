@@ -53,6 +53,7 @@ router.post('/verify-token', (req: Request, res: Response) => {
 
   if (!token) {
     res.status(401).json({ isAuthenticated: false });
+    return;
   }
 
   try {
