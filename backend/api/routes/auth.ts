@@ -53,18 +53,20 @@ router.get(
       }
 
       // Generate JWT token using the JWT_SECRET
-      const token = jwt.sign(
-        {
-          id: req.user._id.toString(),
-          _id: req.user._id.toString(),
-          displayName: req.user.displayName,
-          email: req.user.email,
-          picture: req.user.picture,
-        },
-        env.JWT_SECRET,
-        { expiresIn: '24h' },
-      );
-
+      const payload: UserPayload = {
+        id: req.user._id.toString(),
+        _id: req.user._id.toString(),
+        displayName: req.user.displayName || 'User',
+        ...(req.user.email && { email: req.user.email }),
+        ...(req.user.picture && { picture: req.user.picture }),
+      };
+      const token = jwt.sign(payload, env.JWT_SECRET, { expiresIn: '24h' });
+      console.log('User for token generation:', {
+        hasId: !!req.user?.id,
+        has_id: !!req.user?._id,
+        idType: req.user?._id ? typeof req.user._id : 'undefined',
+        email: req.user?.email,
+      });
       console.log(`Token generated for user: ${req.user.displayName}`);
 
       // Redirect with token to frontend
