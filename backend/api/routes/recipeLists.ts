@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import {
   createRecipeList,
   getRecipeLists,
@@ -7,7 +7,7 @@ import {
 } from '../controllers/recipeListControllers';
 import { authenticate } from '../middleware/auth';
 
-const router = Router();
+const router = express.Router();
 
 // Create a new recipe list
 router.post('/', authenticate, createRecipeList);
