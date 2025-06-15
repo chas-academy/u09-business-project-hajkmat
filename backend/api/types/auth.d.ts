@@ -20,6 +20,7 @@ declare global {
       email: string;
       name?: string;
       recipeLists?: IRecipe[];
+      picture?: string;
     }
   }
 }

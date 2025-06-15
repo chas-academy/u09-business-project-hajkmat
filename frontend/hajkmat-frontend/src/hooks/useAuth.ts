@@ -15,23 +15,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const handleTokenAuthentication = async (token: string) => {
     try {
-      console.log('handleTokenAuthentication called with token');
-
-      // Store token (redundant but ensures it's set)
+      // Store token (although this is already done in AuthCallback)
       localStorage.setItem('auth_token', token);
 
-      // Verify token and update state
-      await checkAuthStatus();
-
-      // Check if it worked
-      console.log('Auth state after token processing:', {
-        isAuthenticated,
-        user: user?.displayName || 'No user',
+      // Verify token with backend
+      const response = await fetch(`${API_URL}/auth/verify-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
       });
 
-      return isAuthenticated;
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        setIsAuthenticated(true);
+        return true;
+      } else {
+        localStorage.removeItem('auth_token');
+        setUser(null);
+        setIsAuthenticated(false);
+        return false;
+      }
     } catch (err) {
       console.error('Token authentication failed:', err);
+      localStorage.removeItem('auth_token');
+      setUser(null);
+      setIsAuthenticated(false);
       return false;
     }
   };

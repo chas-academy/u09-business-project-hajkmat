@@ -12,6 +12,7 @@ declare global {
       GOOGLE_CLIENT_ID?: string;
       GOOGLE_CLIENT_SECRET?: string;
       SESSION_SECRET?: string;
+      JWT_SECRET?: string;
     }
   }
 }
@@ -22,6 +23,7 @@ const env = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
   SESSION_SECRET: process.env.SESSION_SECRET || 'your_default_session_secret',
+  JWT_SECRET: process.env.JWT_SECRET || 'your_default_jwt_secret',
 };
 
 export default env;
