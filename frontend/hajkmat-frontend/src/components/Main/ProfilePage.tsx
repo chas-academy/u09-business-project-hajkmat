@@ -25,14 +25,23 @@ const ProfilePage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // Use Record<string, any> for a simple type assertion
+      const data = (await response.json()) as Record<string, any>;
+
       if (!response.ok) {
-        throw new Error('Failed to delete account');
+        throw new Error(data.error || 'Failed to delete account');
       }
 
+      // Now TypeScript won't complain about accessing properties
+      console.log('Account deleted successfully:', data.message);
+
       await logout();
-      navigate('/');
+      navigate('/', { replace: true });
     } catch (err) {
-      setError('Failed to delete account');
+      console.error('Delete account error:', err);
+      setError(
+        typeof err === 'object' && err instanceof Error ? err.message : 'Failed to delete account',
+      );
     }
   };
 
