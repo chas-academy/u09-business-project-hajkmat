@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './database/db';
 import routes from './routes/routes';
 import cors from 'cors';
+import session from 'express-session'; 
 import passport from 'passport';
 import './config/passport';
 
@@ -24,6 +25,17 @@ const allowedOrigins = {
 app.use(cors(allowedOrigins));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Session middleware for Oauth
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_default_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 
 // Passport middleware
 app.use(passport.initialize());
