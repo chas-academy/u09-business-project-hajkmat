@@ -58,33 +58,48 @@ export const deleteAccount = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    console.log('Attempting to delete user with email:', email);
-
-    // First, find the user by email to get their ID
+    // Find the user by email
     const user = await User.findOne({ email });
 
     if (!user) {
-      console.log('No user found with email:', email);
       res.status(404).json({ error: 'User not found' });
       return;
     }
 
-    console.log('Found user to delete:', user._id);
-
     // Delete user by ID
-    const deletedUser = await User.findByIdAndDelete(user._id);
+    await User.findByIdAndDelete(user._id);
 
-    if (!deletedUser) {
-      console.log('Failed to delete user with ID:', user._id);
-      res.status(500).json({ error: 'Failed to delete user' });
-      return;
-    }
-
-    // Also delete any associated recipe lists
+    // Also delete associated recipe lists
     await RecipeList.deleteMany({ user: user._id });
 
-    console.log('Successfully deleted user and their recipe lists');
-    res.status(200).json({ message: 'Account deleted successfully' });
+    // Step 1: Logout the user (for session-based auth)
+    req.logout((logoutErr) => {
+      if (logoutErr) {
+        console.error('Error during logout after account deletion:', logoutErr);
+        // Continue with session destruction even if logout fails
+      }
+
+      // Step 2: Destroy the session
+      req.session.destroy((sessionErr) => {
+        if (sessionErr) {
+          console.error('Error destroying session after account deletion:', sessionErr);
+          res.status(200).json({
+            message: 'Account deleted successfully, but session cleanup failed',
+            logout: true,
+          });
+          return;
+        }
+
+        // Step 3: Clear any cookies
+        res.clearCookie('connect.sid'); // Default Express session cookie
+
+        // Step 4: Respond with success and signal frontend to clear tokens
+        res.status(200).json({
+          message: 'Account deleted successfully and logged out',
+          logout: true,
+        });
+      });
+    });
   } catch (error) {
     console.error('Error in deleteAccount:', error);
     res.status(500).json({ error: 'Server error while deleting account' });
