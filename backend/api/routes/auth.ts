@@ -6,7 +6,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import env from '../config/env';
 import { authenticate } from '../middleware/auth';
 
-console.log('Auth routes file loaded');
+console.log('Auth routes loading, deleteAccount function:', typeof deleteAccount);
 
 interface UserPayload extends JwtPayload {
   id: string;
@@ -31,6 +31,9 @@ router.get('/test', (req, res) => {
   console.log('Auth test route accessed');
   res.json({ message: 'Auth test route works' });
 });
+router.get('/auth-test', (req, res) => {
+  res.json({ message: 'Authenticated route works' });
+});
 // Google OAuth login route
 router.get(
   '/google',
@@ -52,7 +55,7 @@ router.get(
       // Generate JWT token using the JWT_SECRET
       const token = jwt.sign(
         {
-          id: req.user._id,
+          _id: req.user._id,
           displayName: req.user.displayName,
           email: req.user.email,
           // Use optional chaining for nested properties that might not exist

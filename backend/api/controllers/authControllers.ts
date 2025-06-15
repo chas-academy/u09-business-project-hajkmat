@@ -50,7 +50,9 @@ export const logout = (req: Request, res: Response) => {
 
 export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req.user as any).id;
+    const userId = (req.user as any)._id || (req.user as any).id;
+    console.log('User object from request:', req.user);
+    console.log('Attempting to delete user with ID:', userId);
 
     const deletedUser = await User.findByIdAndDelete(userId);
 
