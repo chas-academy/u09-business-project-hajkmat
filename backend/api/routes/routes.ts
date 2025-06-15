@@ -1,6 +1,6 @@
 import express from 'express';
 import authRoutes from './auth';
-import recipeListRoutes from './recipeListRoutes';
+import recipeListRoutes from './recipeLists';
 
 const router = express.Router();
 
