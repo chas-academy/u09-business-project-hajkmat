@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import connectDB from './database/db';
 import routes from './routes/routes';
 import cors from 'cors';
-import session from 'express-session'; 
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import './config/passport';
 
@@ -15,27 +16,34 @@ const app: Express = express();
 const port: number = parseInt(process.env.PORT || '3000', 10);
 
 // CORS configuration
-const allowedOrigins = {
+const corsOptions = {
   origin:
     process.env.NODE_ENV === 'production' ? 'https://hajkmat.netlify.app' : 'http://localhost:5173',
   credentials: true,
 };
 
 // Apply CORS
-app.use(cors(allowedOrigins));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session middleware for Oauth
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your_default_session_secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your_default_session_secret',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: 'sessions',
+      ttl: 24 * 60 * 60,
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  }),
+);
 
 // Passport middleware
 app.use(passport.initialize());
