@@ -40,6 +40,40 @@ export const getRecipeLists = async (req: Request, res: Response): Promise<void>
   }
 };
 
+// Update a recipe list
+export const updateRecipeList = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const userId = req.user._id;
+
+  try {
+    // Find the recipe list and ensure it belongs to the current user
+    const recipeList = await RecipeList.findOne({ _id: id, user: userId });
+
+    if (!recipeList) {
+      res.status(404).json({ error: 'Recipe list not found' });
+      return;
+    }
+
+    // Update using set method instead of direct property assignment
+    recipeList.set('name', name);
+
+    // Save changes
+    await recipeList.save();
+
+    res.status(200).json(recipeList);
+  } catch (error: unknown) {
+    console.error('Failed to update recipe list:', error);
+    res.status(500).json({ error: 'Failed to update recipe list' });
+  }
+};
+
 // Delete a recipe list
 export const deleteRecipeList = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;

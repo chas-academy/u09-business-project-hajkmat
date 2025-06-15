@@ -6,6 +6,7 @@ export interface IRecipe {
 }
 
 export interface IRecipeList extends Document {
+  name: string;
   userId: string;
   recipes: IRecipe[];
 }
