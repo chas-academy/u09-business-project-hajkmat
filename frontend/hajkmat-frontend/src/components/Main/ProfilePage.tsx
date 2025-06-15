@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import API_URL from '../../config/api';
@@ -9,6 +9,11 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  useEffect(() => {
+  console.log("Current API_URL:", API_URL);
+  console.log("Delete account endpoint:", `${API_URL}/auth/delete-account`);
+}, []);
 
   const handleDeleteAccount = async () => {
     try {
