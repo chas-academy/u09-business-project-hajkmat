@@ -50,22 +50,43 @@ export const logout = (req: Request, res: Response) => {
 
 export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
   try {
-    const userId = (req.user as any)._id || (req.user as any).id;
-    console.log('User object from request:', req.user);
-    console.log('Attempting to delete user with ID:', userId);
+    // Get email from the authenticated user in the token
+    const email = (req.user as any).email;
 
-    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!email) {
+      res.status(400).json({ error: 'Email not found in authentication token' });
+      return;
+    }
 
-    if (!deletedUser) {
+    console.log('Attempting to delete user with email:', email);
+
+    // First, find the user by email to get their ID
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      console.log('No user found with email:', email);
       res.status(404).json({ error: 'User not found' });
       return;
     }
 
-    await RecipeList.deleteMany({ user: userId });
+    console.log('Found user to delete:', user._id);
 
+    // Delete user by ID
+    const deletedUser = await User.findByIdAndDelete(user._id);
+
+    if (!deletedUser) {
+      console.log('Failed to delete user with ID:', user._id);
+      res.status(500).json({ error: 'Failed to delete user' });
+      return;
+    }
+
+    // Also delete any associated recipe lists
+    await RecipeList.deleteMany({ user: user._id });
+
+    console.log('Successfully deleted user and their recipe lists');
     res.status(200).json({ message: 'Account deleted successfully' });
   } catch (error) {
-    console.error('Error deleting account:', error);
-    res.status(500).json({ error: 'Failed to delete account' });
+    console.error('Error in deleteAccount:', error);
+    res.status(500).json({ error: 'Server error while deleting account' });
   }
 };

@@ -48,10 +48,17 @@ router.get(
         return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_user`);
       }
 
-      // Create JWT token
+      console.log('User object from OAuth:', req.user); // Log the user object
+
+      // Create JWT token with proper null checks
       const payload: UserPayload = {
-        id: req.user._id.toString(),
-        displayName: req.user.displayName || 'User',
+        // Use safe access with fallbacks
+        id: req.user._id
+          ? req.user._id.toString()
+          : req.user.id
+            ? req.user.id.toString()
+            : req.user.googleId || '',
+        displayName: req.user.displayName || req.user.name || 'User',
         ...(req.user.email && { email: req.user.email }),
         ...(req.user.picture && { picture: req.user.picture }),
       };
