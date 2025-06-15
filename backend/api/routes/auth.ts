@@ -55,13 +55,13 @@ router.get(
       // Generate JWT token using the JWT_SECRET
       const token = jwt.sign(
         {
-          _id: req.user._id,
+          id: req.user._id.toString(),
+          _id: req.user._id.toString(),
           displayName: req.user.displayName,
           email: req.user.email,
-          // Use optional chaining for nested properties that might not exist
           picture: req.user.picture,
         },
-        env.JWT_SECRET, // Use your environment config
+        env.JWT_SECRET,
         { expiresIn: '24h' },
       );
 
