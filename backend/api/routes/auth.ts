@@ -4,6 +4,9 @@ import passport from 'passport';
 import cors from 'cors';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import env from '../config/env';
+import { authenticate } from '../middleware/auth';
+import RecipeList from '../models/recipeList';
+import User from '../models/user';
 
 interface UserPayload extends JwtPayload {
   id: string;
@@ -118,6 +121,26 @@ router.post('/logout', (req: Request, res: Response) => {
     }
     res.status(200).json({ success: true });
   });
+});
+
+router.delete('/delete-account', authenticate, async (req: Request, res: Response) => {
+  try {
+    const userId = (req.user as any).id;
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    await RecipeList.deleteMany({ user: userId });
+
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
 });
 
 export default router;
