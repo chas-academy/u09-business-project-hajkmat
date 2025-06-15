@@ -4,8 +4,6 @@ import connectDB from './database/db';
 import routes from './routes/routes';
 import cors from 'cors';
 import passport from 'passport';
-import session from 'express-session';
-import MongoStore from 'connect-mongo';
 import './config/passport';
 
 // Load environment variables
@@ -16,53 +14,25 @@ const app: Express = express();
 const port: number = parseInt(process.env.PORT || '3000', 10);
 
 // CORS configuration
-const allowedOrigins = ['https://hajkmat.netlify.app', 'http://localhost:5173'];
+const allowedOrigins = {
+  origin:
+    process.env.NODE_ENV === 'production' ? 'https://hajkmat.netlify.app' : 'http://localhost:5173',
+  credentials: true,
+};
 
 // Apply CORS
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  }),
-);
-
+app.use(cors(allowedOrigins));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Session middleware - MUST come before passport
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl:
-        process.env.MONGODB_URI_PROD ||
-        process.env.MONGODB_URI ||
-        'mongodb://localhost:27017/hajkmat',
-      collectionName: 'sessions',
-    }),
-    cookie: {
-      secure: true,
-      sameSite: 'none',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  }),
-);
 
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Health check route
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'Server is running' });
+});
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
