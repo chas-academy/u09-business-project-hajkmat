@@ -10,7 +10,7 @@ export const createRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user._id;
+  const userId = (req.user as any).id;
 
   try {
     const newList = new RecipeList({ name, user: userId });
@@ -29,7 +29,7 @@ export const getRecipeLists = async (req: Request, res: Response): Promise<void>
     return;
   }
 
-  const userId = req.user._id;
+  const userId = (req.user as any).id;
 
   try {
     const lists = await RecipeList.find({ user: userId });
@@ -50,7 +50,7 @@ export const updateRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user._id;
+  const userId = (req.user as any).id;
 
   try {
     // Find the recipe list and ensure it belongs to the current user
@@ -83,7 +83,7 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user._id;
+  const userId = (req.user as any).id;
 
   try {
     const list = await RecipeList.findOneAndDelete({ _id: id, user: userId });
