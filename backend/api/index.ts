@@ -16,14 +16,13 @@ const app: Express = express();
 const port: number = parseInt(process.env.PORT || '3001', 10);
 
 // CORS configuration
-const corsOptions = {
-  origin:
-    process.env.NODE_ENV === 'production' ? 'https://hajkmat.netlify.app' : 'http://localhost:5173',
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' ? 'https://hajkmat.netlify.app' : 'http://localhost:5173',
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
-};
-
-// Apply CORS
-app.use(cors(corsOptions));
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
