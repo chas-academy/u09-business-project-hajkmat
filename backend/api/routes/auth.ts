@@ -76,6 +76,14 @@ router.get(
     }
   },
 );
+router.get('/debug-token', authenticate, (req, res) => {
+  console.log('User from authenticated request:', req.user);
+  res.json({
+    user: req.user,
+    hasId: typeof (req.user as any).id !== 'undefined',
+    hasMongoId: typeof (req.user as any)._id !== 'undefined',
+  });
+});
 // Endpoint to verify token
 router.post('/verify-token', (req, res) => {
   try {
