@@ -19,29 +19,27 @@ const ProfilePage = () => {
     try {
       const token = localStorage.getItem('auth_token');
 
-      console.log('Trying primary delete route...');
-      let response = await fetch(`${API_URL}/auth/delete-account`, {
+      console.log('Attempting to delete account...');
+      const response = await fetch(`${API_URL}/auth/delete-account`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      // Use Record<string, any> for a simple type assertion
-      const data = (await response.json()) as Record<string, any>;
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to delete account');
+        throw new Error('Failed to delete account');
       }
 
-      // Now TypeScript won't complain about accessing properties
-      console.log('Account deleted successfully:', data.message);
-
+      // Use the logout function from your auth context
+      // This will handle removing the token and updating state
       await logout();
+
+      // Navigate to home page
       navigate('/', { replace: true });
     } catch (err) {
       console.error('Delete account error:', err);
-      setError(
-        typeof err === 'object' && err instanceof Error ? err.message : 'Failed to delete account',
-      );
+      setError('Failed to delete account');
     }
   };
 

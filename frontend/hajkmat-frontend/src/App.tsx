@@ -5,6 +5,7 @@ import TitleUpdater from './components/TitleUpdater';
 import Home from './components/Main/Home/Home';
 import Login from './components/auth/Login';
 import ProfilePage from './components/Main/ProfilePage';
+import AboutUs from './components/Main/AboutUs';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './hooks/useAuth';
 import AuthCallback from './components/auth/AuthCallback';
@@ -21,6 +22,7 @@ function App() {
             {/* Your page content goes here */}
             <Routes>
               <Route path="/" element={<Home />} /> {/* Home is now accessible to everyone */}
+              <Route path="about" element={<AboutUs />} />
               <Route path="/login" element={<Login />} /> {/* New login route */}
               <Route path="/auth-callback" element={<AuthCallback />} />
               {/* Protected routes */}
