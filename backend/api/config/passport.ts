@@ -22,7 +22,10 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: 'http://localhost:5173/api/auth/google/callback',
+      callbackURL:
+        process.env.NODE_ENV === 'production'
+          ? 'https://u09-business-project-hajkmat.onrender.com/api/auth/google/callback' // Backend URL
+          : 'http://localhost:3000/api/auth/google/callback',
       scope: ['profile', 'email'],
     },
     async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) => {
