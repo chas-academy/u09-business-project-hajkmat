@@ -25,15 +25,6 @@ const ProfilePage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // If main route fails, try the alternative
-      if (response.status === 404) {
-        console.log('Primary route failed, trying alternative...');
-        response = await fetch(`${API_URL}/auth/delete-account-alt`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-
       if (!response.ok) {
         throw new Error('Failed to delete account');
       }

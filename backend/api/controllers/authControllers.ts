@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import passport from 'passport';
 import User from '../models/user';
+import RecipeList from '../models/recipeList';
 
 // Login function
 export const login = (req: Request, res: Response) => {
@@ -45,4 +46,24 @@ export const logout = (req: Request, res: Response) => {
     }
     return res.status(200).json({ message: 'Logged out successfully' });
   });
+};
+
+export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req.user as any).id;
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    await RecipeList.deleteMany({ user: userId });
+
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    res.status(500).json({ error: 'Failed to delete account' });
+  }
 };
