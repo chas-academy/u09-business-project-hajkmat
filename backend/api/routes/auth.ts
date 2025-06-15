@@ -8,6 +8,8 @@ import { authenticate } from '../middleware/auth';
 import RecipeList from '../models/recipeList';
 import User from '../models/user';
 
+console.log('Auth routes file loaded');
+
 interface UserPayload extends JwtPayload {
   id: string;
   displayName: string;
@@ -21,7 +23,10 @@ const corsOptions = {
   credentials: true,
 };
 const router = Router();
-
+router.get('/test', (req, res) => {
+  console.log('Auth test route accessed');
+  res.json({ message: 'Auth test route works' });
+});
 // Google OAuth login route
 router.get(
   '/google',
@@ -142,5 +147,10 @@ router.delete('/delete-account', authenticate, async (req: Request, res: Respons
     res.status(500).json({ error: 'Failed to delete account' });
   }
 });
+
+console.log(
+  'Auth routes registered:',
+  router.stack.filter((layer) => layer.route).map((layer) => layer.route?.path),
+);
 
 export default router;

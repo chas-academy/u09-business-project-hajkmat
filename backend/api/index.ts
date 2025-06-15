@@ -13,7 +13,7 @@ dotenv.config();
 
 // Initialize express app
 const app: Express = express();
-const port: number = parseInt(process.env.PORT || '3000', 10);
+const port: number = parseInt(process.env.PORT || '3001', 10);
 
 // CORS configuration
 const corsOptions = {
@@ -59,7 +59,9 @@ app.get('/', (req: Request, res: Response) => {
   res.status(200).json({ message: 'HAJKMAT' });
 });
 
+console.log('About to mount API routes');
 app.use('/api', routes);
+console.log('API routes mounted');
 
 // 404 handler
 app.use((req: Request, res: Response) => {

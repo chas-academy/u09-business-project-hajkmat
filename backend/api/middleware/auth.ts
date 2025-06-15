@@ -16,9 +16,13 @@ interface AuthRequest extends Request {
 
 export const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction): void => {
   const authHeader = req.headers['authorization'];
+  console.log('Auth request to:', req.method, req.path);
+  console.log('Auth header present:', !!authHeader);
+
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
+    console.log('No token provided in request');
     res.status(401).json({ error: 'No token provided' });
     return;
   }
@@ -26,6 +30,9 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   try {
     // Add type assertion to tell TypeScript about the payload structure
     const decoded = jwt.verify(token, env.JWT_SECRET) as UserPayload;
+
+    // Log successful verification
+    console.log('Token verified for user:', decoded.email || decoded.id);
 
     // Now TypeScript knows decoded has displayName property
     req.user = decoded;
