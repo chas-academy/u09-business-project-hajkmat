@@ -100,6 +100,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Remove token instead of clearing cookies
       localStorage.removeItem('auth_token');
 
+      // Update authentication state in your app
+      setIsAuthenticated(false);
+      setUser(null);
+
       return true;
     } catch (err) {
       console.error('Logout failed:', err);
