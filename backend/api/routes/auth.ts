@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import { login, register } from '../controllers/authControllers';
 import passport from 'passport';
 import cors from 'cors';
@@ -22,7 +22,7 @@ const corsOptions = {
     process.env.NODE_ENV === 'production' ? 'https://hajkmat.netlify.app' : 'http://localhost:5173',
   credentials: true,
 };
-const router = Router();
+const router = express.Router();
 router.get('/test', (req, res) => {
   console.log('Auth test route accessed');
   res.json({ message: 'Auth test route works' });
