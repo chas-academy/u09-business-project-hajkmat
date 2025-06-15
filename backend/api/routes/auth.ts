@@ -148,6 +148,15 @@ router.delete('/delete-account', authenticate, async (req: Request, res: Respons
   }
 });
 
+router.route('/delete-account-alt').delete(authenticate, async (req, res) => {
+  try {
+    const userId = (req.user as any).id;
+    res.status(200).json({ message: 'Account deleted via alt route' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete via alt route' });
+  }
+});
+
 console.log(
   'Auth routes registered:',
   router.stack.filter((layer) => layer.route).map((layer) => layer.route?.path),

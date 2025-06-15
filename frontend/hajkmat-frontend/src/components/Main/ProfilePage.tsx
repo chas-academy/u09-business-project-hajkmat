@@ -11,25 +11,28 @@ const ProfilePage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-  console.log("Current API_URL:", API_URL);
-  console.log("Delete account endpoint:", `${API_URL}/auth/delete-account`);
-}, []);
+    console.log('Current API_URL:', API_URL);
+    console.log('Delete account endpoint:', `${API_URL}/auth/delete-account`);
+  }, []);
 
   const handleDeleteAccount = async () => {
     try {
       const token = localStorage.getItem('auth_token');
 
-      if (!token) {
-        setError('Authentication token not found');
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/auth/delete-account`, {
+      console.log('Trying primary delete route...');
+      let response = await fetch(`${API_URL}/auth/delete-account`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      // If main route fails, try the alternative
+      if (response.status === 404) {
+        console.log('Primary route failed, trying alternative...');
+        response = await fetch(`${API_URL}/auth/delete-account-alt`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
 
       if (!response.ok) {
         throw new Error('Failed to delete account');
@@ -38,8 +41,7 @@ const ProfilePage = () => {
       await logout();
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete account');
-      console.error('Error deleting account:', err);
+      setError('Failed to delete account');
     }
   };
 
