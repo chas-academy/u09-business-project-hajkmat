@@ -21,6 +21,12 @@ const corsOptions = {
   credentials: true,
 };
 const router = express.Router();
+router.get('/', (req, res) => {
+  res.json({
+    message: 'Auth API is working',
+    availableRoutes: ['/login', '/register', '/delete-account'],
+  });
+});
 router.get('/test', (req, res) => {
   console.log('Auth test route accessed');
   res.json({ message: 'Auth test route works' });
@@ -127,6 +133,10 @@ router.post('/logout', (req: Request, res: Response) => {
 });
 
 router.delete('/delete-account', authenticate, deleteAccount);
+
+router.delete('/test-delete', (req, res) => {
+  res.json({ message: 'DELETE method works on auth router' });
+});
 
 console.log(
   'Auth routes registered:',
