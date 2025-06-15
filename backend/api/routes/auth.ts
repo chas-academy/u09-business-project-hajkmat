@@ -2,7 +2,15 @@ import { Router, Request, Response } from 'express';
 import { login, register } from '../controllers/authControllers';
 import passport from 'passport';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import env from '../config/env';
+
+interface UserPayload extends JwtPayload {
+  id: string;
+  displayName: string;
+  email?: string;
+  picture?: string;
+}
 
 const corsOptions = {
   origin:
@@ -24,52 +32,60 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    if (!req.user) {
-      return res.redirect('https://hajkmat.netlify.app/login?error=no_user');
-    }
-
     try {
-      // Create JWT token
+      if (!req.user) {
+        return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_user`);
+      }
+
+      // Generate JWT token using the JWT_SECRET
       const token = jwt.sign(
         {
-          id: req.user.id || (req.user as any)._id,
+          id: req.user._id,
           displayName: req.user.displayName,
-          email: (req.user as any).emails?.[0]?.value || (req.user as any).email,
-          picture: (req.user as any).photos?.[0]?.value || (req.user as any).picture,
+          email: req.user.email,
+          // Use optional chaining for nested properties that might not exist
+          picture: req.user.picture,
         },
-        process.env.JWT_SECRET || 'your-jwt-secret',
+        env.JWT_SECRET, // Use your environment config
         { expiresIn: '24h' },
       );
 
-      // Log for debugging
-      console.log('Generated token for user:', req.user.displayName);
+      console.log(`Token generated for user: ${req.user.displayName}`);
 
-      // IMPORTANT: Make sure this URL is correct
-      const frontendUrl = process.env.FRONTEND_URL || 'https://hajkmat.netlify.app';
-      res.redirect(`${frontendUrl}/auth-callback?token=${token}`);
+      // Redirect with token to frontend
+      const redirectUrl = `${process.env.FRONTEND_URL}/auth-callback?token=${token}`;
+      res.redirect(redirectUrl);
     } catch (error) {
-      console.error('Token generation error:', error);
-      res.redirect('https://hajkmat.netlify.app/login?error=token_error');
+      console.error('Error in OAuth callback:', error);
+      res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
     }
   },
 );
 // Endpoint to verify token
-router.post('/verify-token', (req: Request, res: Response) => {
-  const { token } = req.body;
-
-  if (!token) {
-    res.status(401).json({ isAuthenticated: false });
-    return;
-  }
-
+router.post('/verify-token', (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+    const { token } = req.body;
+
+    if (!token) {
+      console.log('No token provided in verification request');
+      res.status(401).json({ isAuthenticated: false });
+      return; // Return without a value
+    }
+
+    // Verify the token using JWT_SECRET
+    const decoded = jwt.verify(token, env.JWT_SECRET) as UserPayload;
+
+    console.log(`Token verified for user: ${decoded.displayName}`);
+
     res.status(200).json({
       isAuthenticated: true,
       user: decoded,
     });
+    // No return statement here
   } catch (err) {
+    console.error('Token verification error:', err);
     res.status(401).json({ isAuthenticated: false });
+    // No return statement here
   }
 });
 
