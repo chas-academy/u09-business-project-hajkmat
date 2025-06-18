@@ -10,6 +10,7 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AuthProvider } from './hooks/useAuth';
 import AuthCallback from './components/auth/AuthCallback';
 import './App.css';
+import RecipeSearch from './components/Main/Recipelist/Recipesearch';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
               {/* Protected routes */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/lists" element={<RecipeSearch />} />
                 {/* Add more protected routes here */}
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
