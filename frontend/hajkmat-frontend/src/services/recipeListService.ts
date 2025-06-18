@@ -1,13 +1,14 @@
 // services/recipeListService.ts
 import { Recipe } from '../types/recipe';
 import { RecipeList } from '../types/recipeList';
+import API_URL from '../config/api';
 
 /**
  * Add a recipe to a list
  */
 export const addRecipeToList = async (listId: string, recipe: Recipe): Promise<RecipeList> => {
   try {
-    const response = await fetch(`/api/recipe-lists/${listId}/recipes`, {
+    const response = await fetch(`${API_URL}/recipe-lists/${listId}/recipes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +38,7 @@ export const removeRecipeFromList = async (
   recipeId: string,
 ): Promise<RecipeList> => {
   try {
-    const response = await fetch(`/api/recipe-lists/${listId}/recipes/${recipeId}`, {
+    const response = await fetch(`${API_URL}/recipe-lists/${listId}/recipes/${recipeId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
