@@ -12,7 +12,7 @@ export const createRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user?._id || req.user?.id;
+  const userId = req.user?._id.toString() || req.user?.id.toString();
 
   try {
     const newList = new RecipeList({ name, user: userId });
@@ -31,7 +31,7 @@ export const getRecipeLists = async (req: Request, res: Response): Promise<void>
     return;
   }
 
-  const userId = req.user?._id || req.user?.id;
+  const userId = req.user?._id.toString() || req.user?.id.toString();
 
   try {
     const lists = await RecipeList.find({ userId: userId });
@@ -52,7 +52,7 @@ export const updateRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user?._id || req.user?.id;
+  const userId = req.user?._id.toString() || req.user?.id.toString();
 
   try {
     const recipeList = await RecipeList.findOne({ _id: id, userId: userId });
@@ -84,7 +84,7 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user?._id || req.user?.id;
+  const userId = req.user?._id.toString() || req.user?.id.toString();
 
   try {
     const list = await RecipeList.findOneAndDelete({ _id: id, userId: userId });
@@ -105,7 +105,7 @@ export const addRecipeToList = async (req: Request, res: Response): Promise<Resp
     const { id: listId } = req.params;
     const { recipe } = req.body;
 
-    const userId = req.user?._id || req.user?.id;
+    const userId = req.user?._id.toString() || req.user?.id.toString();
 
     if (!userId) {
       return res.status(401).json({
@@ -177,7 +177,7 @@ export const removeRecipeFromList = async (req: Request, res: Response): Promise
   try {
     const { listId, recipeId } = req.params;
     // Use req.user directly (assuming auth middleware adds this)
-    const userId = req.user?.id;
+    const userId = req.user?.id.toString() || req.user?.id.toString();;
 
     if (!userId) {
       return res.status(401).json({
