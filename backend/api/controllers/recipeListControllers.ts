@@ -12,7 +12,7 @@ export const createRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = (req.user as any)._id;
+  const userId = req.user?._id || req.user?.id;
 
   try {
     const newList = new RecipeList({ name, user: userId });
@@ -31,7 +31,7 @@ export const getRecipeLists = async (req: Request, res: Response): Promise<void>
     return;
   }
 
-  const userId = (req.user as any)._id;
+  const userId = req.user?._id || req.user?.id;
 
   try {
     const lists = await RecipeList.find({ user: userId });
@@ -52,7 +52,7 @@ export const updateRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = (req.user as any)._id;
+  const userId = req.user?._id || req.user?.id;
 
   try {
     // Find the recipe list and ensure it belongs to the current user
@@ -85,7 +85,7 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = (req.user as any)._id;
+  const userId = req.user?._id || req.user?.id;
 
   try {
     const list = await RecipeList.findOneAndDelete({ _id: id, user: userId });
@@ -106,7 +106,6 @@ export const addRecipeToList = async (req: Request, res: Response): Promise<Resp
     const { id: listId } = req.params;
     const { recipe } = req.body;
 
-    // Access user from req.user (as defined in your auth.d.ts)
     const userId = req.user?._id || req.user?.id;
 
     if (!userId) {
@@ -119,7 +118,7 @@ export const addRecipeToList = async (req: Request, res: Response): Promise<Resp
     // Find the list and make sure it belongs to the user
     const recipeList = await RecipeList.findOne({
       _id: listId,
-      userId,
+      user: userId,
     });
 
     if (!recipeList) {
@@ -195,7 +194,7 @@ export const removeRecipeFromList = async (req: Request, res: Response): Promise
     const result = await RecipeList.updateOne(
       {
         _id: listId,
-        userId,
+        user: userId,
         recipes: recipeId,
       },
       {

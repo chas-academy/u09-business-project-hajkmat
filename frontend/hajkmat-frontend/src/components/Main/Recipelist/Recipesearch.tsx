@@ -7,6 +7,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { addRecipeToList, removeRecipeFromList } from '../../../services/recipeListService';
 import { Recipe } from '../../../types/recipe';
 import { RecipeList } from '../../../types/recipeList';
+import API_URL from '../../../config/api';
 
 interface FilterOptions {
   [key: string]: boolean;
@@ -83,8 +84,7 @@ const RecipeSearch = () => {
 
   const fetchUserLists = async () => {
     try {
-      // This would be your actual API call to get the user's lists
-      const response = await fetch('/api/recipe-lists', {
+      const response = await fetch('${API_URL}/recipe-lists', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -267,7 +267,7 @@ const RecipeSearch = () => {
 
     try {
       // This would be your actual API call to create a new list
-      const response = await fetch('/api/recipe-lists', {
+      const response = await fetch(`${API_URL}/recipe-lists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
