@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
+import { Types } from 'mongoose';
 import RecipeList from '../models/recipeList';
+import Recipe, { IRecipeDocument } from '../models/recipe';
 
 // Create a new recipe list
 export const createRecipeList = async (req: Request, res: Response): Promise<void> => {
@@ -95,5 +97,138 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
   } catch (error: unknown) {
     console.error('Failed to delete recipe list:', error);
     res.status(500).json({ error: 'Failed to delete recipe list' });
+  }
+};
+
+// Add a recipe to a recipe list
+export const addRecipeToList = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id: listId } = req.params;
+    const { recipe } = req.body;
+
+    // Access user from req.user (as defined in your auth.d.ts)
+    const userId = req.user?._id || req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+      });
+    }
+
+    // Find the list and make sure it belongs to the user
+    const recipeList = await RecipeList.findOne({
+      _id: listId,
+      userId,
+    });
+
+    if (!recipeList) {
+      return res.status(404).json({
+        success: false,
+        message: 'Recipe list not found',
+      });
+    }
+
+    // Check if recipe exists, if not create it
+    let savedRecipe: IRecipeDocument | null = await Recipe.findOne({ externalId: recipe.id });
+
+    if (!savedRecipe) {
+      savedRecipe = await Recipe.create({
+        externalId: recipe.id,
+        title: recipe.title,
+        image: recipe.image,
+        readyInMinutes: recipe.readyInMinutes,
+        servings: recipe.servings,
+        sourceUrl: recipe.sourceUrl,
+        diets: recipe.diets || [],
+        dishTypes: recipe.dishTypes || [],
+        cuisines: recipe.cuisines || [],
+      });
+    }
+
+    // Check if recipe is already in the list
+    const recipeExists = recipeList.recipes.some(
+      (id) => id.toString() === savedRecipe!._id.toString(),
+    );
+
+    if (recipeExists) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipe already in list',
+      });
+    }
+
+    // Add recipe to list and save
+    await RecipeList.updateOne({ _id: listId }, { $push: { recipes: savedRecipe._id } });
+
+    // Get updated list
+    const updatedList = await RecipeList.findById(listId).populate('recipes');
+
+    return res.status(200).json({
+      success: true,
+      list: updatedList,
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
+  }
+};
+
+// Remove a recipe from a recipe list
+export const removeRecipeFromList = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { listId, recipeId } = req.params;
+    // Use req.user directly (assuming auth middleware adds this)
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+      });
+    }
+
+    // Update the list by pulling the recipe from the array
+    const result = await RecipeList.updateOne(
+      {
+        _id: listId,
+        userId,
+        recipes: recipeId,
+      },
+      {
+        $pull: { recipes: new Types.ObjectId(recipeId) },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'List not found or recipe not in list',
+      });
+    }
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipe not removed',
+      });
+    }
+
+    // Get updated list
+    const updatedList = await RecipeList.findById(listId).populate('recipes');
+
+    return res.status(200).json({
+      success: true,
+      list: updatedList,
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error',
+    });
   }
 };
