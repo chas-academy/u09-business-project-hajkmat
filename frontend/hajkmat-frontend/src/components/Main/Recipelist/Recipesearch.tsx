@@ -84,7 +84,7 @@ const RecipeSearch = () => {
 
   const fetchUserLists = async () => {
     try {
-      const response = await fetch('${API_URL}/recipe-lists', {
+      const response = await fetch(`${API_URL}/recipe-lists`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
@@ -307,7 +307,6 @@ const RecipeSearch = () => {
       );
 
       if (isInList) {
-        // Always use _id as primary since it's non-optional in your interface
         return { inList: true, listId: list._id };
       }
     }
