@@ -15,7 +15,7 @@ export const createRecipeList = async (req: Request, res: Response): Promise<voi
   const userId = req.user.id;
 
   try {
-    const newList = new RecipeList({ name, user: userId });
+    const newList = new RecipeList({ name, userId: userId });
     await newList.save();
     res.status(201).json(newList);
   } catch (error: unknown) {
