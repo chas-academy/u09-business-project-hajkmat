@@ -34,7 +34,7 @@ export const getRecipeLists = async (req: Request, res: Response): Promise<void>
   const userId = req.user?._id || req.user?.id;
 
   try {
-    const lists = await RecipeList.find({ user: userId });
+    const lists = await RecipeList.find({ userId: userId });
     res.status(200).json(lists);
   } catch (error: unknown) {
     console.error('Failed to retrieve recipe lists:', error);
@@ -55,8 +55,7 @@ export const updateRecipeList = async (req: Request, res: Response): Promise<voi
   const userId = req.user?._id || req.user?.id;
 
   try {
-    // Find the recipe list and ensure it belongs to the current user
-    const recipeList = await RecipeList.findOne({ _id: id, user: userId });
+    const recipeList = await RecipeList.findOne({ _id: id, userId: userId });
 
     if (!recipeList) {
       res.status(404).json({ error: 'Recipe list not found' });
@@ -88,7 +87,7 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
   const userId = req.user?._id || req.user?.id;
 
   try {
-    const list = await RecipeList.findOneAndDelete({ _id: id, user: userId });
+    const list = await RecipeList.findOneAndDelete({ _id: id, userId: userId });
     if (!list) {
       res.status(404).json({ error: 'Recipe list not found' });
       return;
@@ -116,10 +115,7 @@ export const addRecipeToList = async (req: Request, res: Response): Promise<Resp
     }
 
     // Find the list and make sure it belongs to the user
-    const recipeList = await RecipeList.findOne({
-      _id: listId,
-      user: userId,
-    });
+    const recipeList = await RecipeList.findOne({ _id: listId, userId: userId });
 
     if (!recipeList) {
       return res.status(404).json({
@@ -190,13 +186,8 @@ export const removeRecipeFromList = async (req: Request, res: Response): Promise
       });
     }
 
-    // Update the list by pulling the recipe from the array
     const result = await RecipeList.updateOne(
-      {
-        _id: listId,
-        user: userId,
-        recipes: recipeId,
-      },
+      { _id: listId, user: userId, recipes: recipeId },
       {
         $pull: { recipes: new Types.ObjectId(recipeId) },
       },
