@@ -1,17 +1,34 @@
-import mongoose, { Schema } from 'mongoose';
-import { IRecipeList } from '../types/recipe';
+import mongoose, { Schema, Document, Types } from 'mongoose';
+import { IRecipeDocument } from './recipe';
 
-const RecipeSchema: Schema = new Schema({
-  name: { type: String, required: true },
-  userId: { type: String, required: true },
-  recipes: [
-    {
-      recipeId: { type: String, required: true },
-      name: { type: String, required: true },
+// Interface for RecipeList document with explicit ID typing
+export interface IRecipeListDocument extends Document {
+  _id: Types.ObjectId;
+  name: string;
+  userId: Types.ObjectId | string;
+  recipes: Types.ObjectId[] | IRecipeDocument[];
+}
+
+// RecipeList schema
+const RecipeListSchema: Schema = new Schema(
+  {
+    name: { type: String, required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-  ],
-});
+    recipes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Recipe',
+      },
+    ],
+  },
+  { timestamps: true },
+);
 
-const RecipeList = mongoose.model<IRecipeList>('RecipeList', RecipeSchema);
+// Create compound index for finding lists by userId
+RecipeListSchema.index({ userId: 1, name: 1 });
 
-export default RecipeList;
+export default mongoose.model<IRecipeListDocument>('RecipeList', RecipeListSchema);
