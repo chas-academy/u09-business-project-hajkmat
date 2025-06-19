@@ -12,7 +12,7 @@ export const createRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user.id;
+  const userId = req.user._id || req.user.id;
 
   try {
     const newList = new RecipeList({ name, userId: userId });
@@ -52,7 +52,7 @@ export const updateRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user.id;
+  const userId = req.user._id || req.user.id;
 
   try {
     const recipeList = await RecipeList.findOne({ _id: id, userId: userId });
@@ -84,7 +84,7 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
     return;
   }
 
-  const userId = req.user.id;
+  const userId = req.user._id || req.user.id;
 
   try {
     const list = await RecipeList.findOneAndDelete({ _id: id, userId: userId });
@@ -100,27 +100,29 @@ export const deleteRecipeList = async (req: Request, res: Response): Promise<voi
 };
 
 // Add a recipe to a recipe list
-export const addRecipeToList = async (req: Request, res: Response): Promise<Response> => {
+export const addRecipeToList = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id: listId } = req.params;
     const { recipe } = req.body;
 
     if (!req.user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication required',
       });
+      return;
     }
 
-    const userId = req.user.id;
+    const userId = req.user._id || req.user.id;
     // Find the list and make sure it belongs to the user
     const recipeList = await RecipeList.findOne({ _id: listId, userId: userId });
 
     if (!recipeList) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'Recipe list not found',
       });
+      return;
     }
 
     // Check if recipe exists, if not create it
@@ -146,10 +148,11 @@ export const addRecipeToList = async (req: Request, res: Response): Promise<Resp
     );
 
     if (recipeExists) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Recipe already in list',
       });
+      return;
     }
 
     // Add recipe to list and save
@@ -158,32 +161,35 @@ export const addRecipeToList = async (req: Request, res: Response): Promise<Resp
     // Get updated list
     const updatedList = await RecipeList.findById(listId).populate('recipes');
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       list: updatedList,
     });
+    return;
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: 'Server error',
     });
+    return;
   }
 };
 
 // Remove a recipe from a recipe list
-export const removeRecipeFromList = async (req: Request, res: Response): Promise<Response> => {
+export const removeRecipeFromList = async (req: Request, res: Response): Promise<void> => {
   try {
     const { listId, recipeId } = req.params;
 
     if (!req.user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication required',
       });
+      return;
     }
 
-    const userId = req.user.id;
+    const userId = req.user._id || req.user.id;
 
     const result = await RecipeList.updateOne(
       { _id: listId, user: userId, recipes: recipeId },
@@ -193,31 +199,35 @@ export const removeRecipeFromList = async (req: Request, res: Response): Promise
     );
 
     if (result.matchedCount === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'List not found or recipe not in list',
       });
+      return;
     }
 
     if (result.modifiedCount === 0) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Recipe not removed',
       });
+      return;
     }
 
     // Get updated list
     const updatedList = await RecipeList.findById(listId).populate('recipes');
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       list: updatedList,
     });
+    return;
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: 'Server error',
     });
+    return;
   }
 };
