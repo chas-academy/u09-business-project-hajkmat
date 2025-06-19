@@ -84,6 +84,7 @@ const RecipeSearch = () => {
 
   const fetchUserLists = async () => {
     try {
+      console.log('Fetching user lists...');
       const response = await fetch(`${API_URL}/recipe-lists`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
@@ -95,7 +96,12 @@ const RecipeSearch = () => {
       }
 
       const data = await response.json();
-      setRecipeLists(data.lists || []);
+      console.log('API response data:', data);
+
+      // Handle different possible response formats
+      const lists = data.lists || data || [];
+      console.log('Lists to display:', lists);
+      setRecipeLists(lists);
     } catch (err) {
       console.error('Error fetching recipe lists:', err);
     }
@@ -209,6 +215,7 @@ const RecipeSearch = () => {
 
   const openAddToListModal = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
+    fetchUserLists();
     setShowListModal(true);
   };
 
@@ -666,14 +673,14 @@ const RecipeSearch = () => {
                 Lägg till i befintlig lista:
               </label>
               <div className="space-y-2 max-h-48 overflow-y-auto">
-                {recipeLists.length > 0 ? (
+                {recipeLists && recipeLists.length > 0 ? (
                   recipeLists.map(list => (
                     <button
-                      key={list.id}
-                      onClick={() => addToList(list._id)}
+                      key={list._id || list.id}
+                      onClick={() => addToList(list._id || list.id || '')}
                       className="w-full text-left px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex justify-between items-center"
                     >
-                      <span>{list.name}</span>
+                      <span>{list.name || 'Unnamed list'}</span>
                       <span className="text-gray-500 text-sm">
                         {list.recipes?.length || 0} recept
                       </span>
