@@ -99,9 +99,14 @@ const RecipeSearch = () => {
       console.log('API response data:', data);
 
       // Handle different possible response formats
-      const lists = data.lists || data || [];
-      console.log('Lists to display:', lists);
-      setRecipeLists(lists);
+      const normalizedLists = (data.lists || data || []).map((list: any) => ({
+        ...list,
+        _id: list._id || list.id || '',
+        id: list._id || list.id || '',
+        recipes: list.recipes || [],
+      }));
+      console.log('Normalized lists:', normalizedLists);
+      setRecipeLists(normalizedLists);
     } catch (err) {
       console.error('Error fetching recipe lists:', err);
     }
@@ -305,8 +310,15 @@ const RecipeSearch = () => {
   };
 
   const findRecipeList = (recipe: Recipe): { inList: boolean; listId: string } => {
+    if (!recipeLists || recipeLists.length === 0) {
+      return { inList: false, listId: '' };
+    }
+
     for (const list of recipeLists) {
-      const isInList = list.recipes?.some(
+      if (!list || !list.recipes) {
+        continue;
+      }
+      const isInList = list.recipes.some(
         (listRecipe: Recipe) =>
           (recipe.id && listRecipe.id === recipe.id) ||
           (recipe._id && listRecipe._id === recipe._id) ||
@@ -323,321 +335,321 @@ const RecipeSearch = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div>
-      {/* Search Form */}
-      <form onSubmit={handleSearch} className="mb-6 bg-white p-4 rounded-lg shadow-sm">
-        {/* Using TextInput component for search */}
-        <TextInput
-          id="recipe-search"
-          label="Sök recept"
-          value={query}
-          onChange={setQuery}
-          placeholder="Sök efter maträtter, ingredienser eller kök..."
-          error={queryError}
-          className="my-2 mx-0"
-        />
+        {/* Search Form */}
+        <form onSubmit={handleSearch} className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+          {/* Using TextInput component for search */}
+          <TextInput
+            id="recipe-search"
+            label="Sök recept"
+            value={query}
+            onChange={setQuery}
+            placeholder="Sök efter maträtter, ingredienser eller kök..."
+            error={queryError}
+            className="my-2 mx-0"
+          />
 
-        {/* Filter sections using checkboxes */}
-        <div className="mb-4">
-          <h3 className="font-medium text-gray-700 mb-2">Välj kök</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-2">
-            {cuisineOptions.map(cuisine => (
-              <Checkbox
-                key={cuisine.id}
-                id={`cuisine-${cuisine.id}`}
-                label={cuisine.label}
-                checked={selectedCuisines[cuisine.id] || false}
-                onChange={isChecked => handleCuisineChange(cuisine.id, isChecked)}
-                className="my-1 mx-0"
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <h3 className="font-medium text-gray-700 mb-2">Kostpreferenser</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-2">
-            {dietOptions.map(diet => (
-              <Checkbox
-                key={diet.id}
-                id={`diet-${diet.id}`}
-                label={diet.label}
-                checked={selectedDiets[diet.id] || false}
-                onChange={isChecked => handleDietChange(diet.id, isChecked)}
-                className="my-1 mx-0"
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <h3 className="font-medium text-gray-700 mb-2">Måltidstyp</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-2">
-            {mealTypeOptions.map(mealType => (
-              <Checkbox
-                key={mealType.id}
-                id={`meal-${mealType.id}`}
-                label={mealType.label}
-                checked={selectedMealTypes[mealType.id] || false}
-                onChange={isChecked => handleMealTypeChange(mealType.id, isChecked)}
-                className="my-1 mx-0"
-              />
-            ))}
-          </div>
-        </div>
-
-        <Button type="submit" variant="primary" size="medium" className="mt-4 mx-0">
-          Sök recept
-        </Button>
-      </form>
-
-      {/* Error Message */}
-      {error && <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md">{error}</div>}
-
-      {/* Selected filters summary */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {Object.keys(selectedCuisines)
-          .filter(key => selectedCuisines[key])
-          .map(cuisine => (
-            <span
-              key={cuisine}
-              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center"
-            >
-              {cuisineOptions.find(opt => opt.id === cuisine)?.label}
-              <button
-                onClick={() => handleCuisineChange(cuisine, false)}
-                className="ml-1 focus:outline-none"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </span>
-          ))}
-        {Object.keys(selectedDiets)
-          .filter(key => selectedDiets[key])
-          .map(diet => (
-            <span
-              key={diet}
-              className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center"
-            >
-              {dietOptions.find(opt => opt.id === diet)?.label}
-              <button
-                onClick={() => handleDietChange(diet, false)}
-                className="ml-1 focus:outline-none"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </span>
-          ))}
-        {Object.keys(selectedMealTypes)
-          .filter(key => selectedMealTypes[key])
-          .map(mealType => (
-            <span
-              key={mealType}
-              className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm flex items-center"
-            >
-              {mealTypeOptions.find(opt => opt.id === mealType)?.label}
-              <button
-                onClick={() => handleMealTypeChange(mealType, false)}
-                className="ml-1 focus:outline-none"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </span>
-          ))}
-      </div>
-
-      {/* Recipe Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {recipes.map(recipe => (
-          <div
-            key={recipe.id}
-            className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-          >
-            <div className="relative">
-              <Image
-                src={recipe.image}
-                alt={recipe.title}
-                objectFit="cover"
-                rounded="md"
-                aspectRatio="16/9"
-                fallbackSrc="/images/recipe-placeholder.jpg"
-                className="w-full h-48"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                <h3 className="text-white font-medium line-clamp-2">{recipe.title}</h3>
-              </div>
-            </div>
-            <div className="p-4">
-              <div className="flex flex-wrap gap-1 mb-3">
-                {recipe.dishTypes?.slice(0, 2).map(type => (
-                  <span
-                    key={type}
-                    className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                  >
-                    {type}
-                  </span>
-                ))}
-                {recipe.diets?.slice(0, 2).map(diet => (
-                  <span
-                    key={diet}
-                    className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
-                  >
-                    {diet}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex justify-between text-sm text-gray-600 mb-3">
-                <span className="flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                  {recipe.readyInMinutes}m
-                </span>
-                <span className="flex items-center">
-                  <svg
-                    className="w-4 h-4 mr-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                    ></path>
-                  </svg>
-                  {recipe.servings}
-                </span>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="primary"
-                  size="small"
-                  className="flex-1 mt-0 mb-0 mx-0"
-                  onClick={() => window.open(recipe.sourceUrl, '_blank', 'noopener,noreferrer')}
-                >
-                  Visa recept
-                </Button>
-
-                {isAuthenticated &&
-                  (() => {
-                    // Check if recipe is in any list
-                    const { inList, listId } = findRecipeList(recipe);
-
-                    return inList && listId ? (
-                      // If already in a list, show Remove button
-                      <Button
-                        variant="danger"
-                        size="small"
-                        className="mt-0 mb-0 mx-0"
-                        onClick={() => handleRemoveRecipe(recipe.id.toString(), listId)}
-                      >
-                        Ta bort
-                      </Button>
-                    ) : (
-                      // If not in any list, show Save button
-                      <Button
-                        variant="secondary"
-                        size="small"
-                        className="mt-0 mb-0 mx-0"
-                        onClick={() => openAddToListModal(recipe)}
-                      >
-                        Spara
-                      </Button>
-                    );
-                  })()}
-
-                {!isAuthenticated && (
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    className="mt-0 mb-0 mx-0"
-                    onClick={() => openAddToListModal(recipe)}
-                    disabled={true}
-                  >
-                    Spara
-                  </Button>
-                )}
-              </div>
+          {/* Filter sections using checkboxes */}
+          <div className="mb-4">
+            <h3 className="font-medium text-gray-700 mb-2">Välj kök</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-2">
+              {cuisineOptions.map(cuisine => (
+                <Checkbox
+                  key={cuisine.id}
+                  id={`cuisine-${cuisine.id}`}
+                  label={cuisine.label}
+                  checked={selectedCuisines[cuisine.id] || false}
+                  onChange={isChecked => handleCuisineChange(cuisine.id, isChecked)}
+                  className="my-1 mx-0"
+                />
+              ))}
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Loading indicator at bottom */}
-      {loading && (
-        <div className="text-center py-8">
-          <svg
-            className="animate-spin h-8 w-8 text-gray-500 mx-auto"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-        </div>
-      )}
+          <div className="mb-4">
+            <h3 className="font-medium text-gray-700 mb-2">Kostpreferenser</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-2">
+              {dietOptions.map(diet => (
+                <Checkbox
+                  key={diet.id}
+                  id={`diet-${diet.id}`}
+                  label={diet.label}
+                  checked={selectedDiets[diet.id] || false}
+                  onChange={isChecked => handleDietChange(diet.id, isChecked)}
+                  className="my-1 mx-0"
+                />
+              ))}
+            </div>
+          </div>
 
-      {/* Load more button */}
-      {!loading && recipes.length > 0 && (
-        <div className="text-center mt-8 mb-4">
-          <Button variant="secondary" size="medium" onClick={loadMore} className="mt-0 mb-0">
-            Ladda fler recept
+          <div className="mb-4">
+            <h3 className="font-medium text-gray-700 mb-2">Måltidstyp</h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-2">
+              {mealTypeOptions.map(mealType => (
+                <Checkbox
+                  key={mealType.id}
+                  id={`meal-${mealType.id}`}
+                  label={mealType.label}
+                  checked={selectedMealTypes[mealType.id] || false}
+                  onChange={isChecked => handleMealTypeChange(mealType.id, isChecked)}
+                  className="my-1 mx-0"
+                />
+              ))}
+            </div>
+          </div>
+
+          <Button type="submit" variant="primary" size="medium" className="mt-4 mx-0">
+            Sök recept
           </Button>
-        </div>
-      )}
+        </form>
 
-      {/* Empty state */}
-      {!loading && recipes.length === 0 && (
-        <div className="text-center py-12 text-gray-600">
-          Inga recept hittades. Försök justera dina sökfilter.
+        {/* Error Message */}
+        {error && <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-md">{error}</div>}
+
+        {/* Selected filters summary */}
+        <div className="mb-4 flex flex-wrap gap-2">
+          {Object.keys(selectedCuisines)
+            .filter(key => selectedCuisines[key])
+            .map(cuisine => (
+              <span
+                key={cuisine}
+                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center"
+              >
+                {cuisineOptions.find(opt => opt.id === cuisine)?.label}
+                <button
+                  onClick={() => handleCuisineChange(cuisine, false)}
+                  className="ml-1 focus:outline-none"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          {Object.keys(selectedDiets)
+            .filter(key => selectedDiets[key])
+            .map(diet => (
+              <span
+                key={diet}
+                className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm flex items-center"
+              >
+                {dietOptions.find(opt => opt.id === diet)?.label}
+                <button
+                  onClick={() => handleDietChange(diet, false)}
+                  className="ml-1 focus:outline-none"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </span>
+            ))}
+          {Object.keys(selectedMealTypes)
+            .filter(key => selectedMealTypes[key])
+            .map(mealType => (
+              <span
+                key={mealType}
+                className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm flex items-center"
+              >
+                {mealTypeOptions.find(opt => opt.id === mealType)?.label}
+                <button
+                  onClick={() => handleMealTypeChange(mealType, false)}
+                  className="ml-1 focus:outline-none"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </span>
+            ))}
         </div>
-      )}
-</div>
+
+        {/* Recipe Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {recipes.map(recipe => (
+            <div
+              key={recipe.id}
+              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+            >
+              <div className="relative">
+                <Image
+                  src={recipe.image}
+                  alt={recipe.title}
+                  objectFit="cover"
+                  rounded="md"
+                  aspectRatio="16/9"
+                  fallbackSrc="/images/recipe-placeholder.jpg"
+                  className="w-full h-48"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                  <h3 className="text-white font-medium line-clamp-2">{recipe.title}</h3>
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {recipe.dishTypes?.slice(0, 2).map(type => (
+                    <span
+                      key={type}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                    >
+                      {type}
+                    </span>
+                  ))}
+                  {recipe.diets?.slice(0, 2).map(diet => (
+                    <span
+                      key={diet}
+                      className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                    >
+                      {diet}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex justify-between text-sm text-gray-600 mb-3">
+                  <span className="flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    {recipe.readyInMinutes}m
+                  </span>
+                  <span className="flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      ></path>
+                    </svg>
+                    {recipe.servings}
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="primary"
+                    size="small"
+                    className="flex-1 mt-0 mb-0 mx-0"
+                    onClick={() => window.open(recipe.sourceUrl, '_blank', 'noopener,noreferrer')}
+                  >
+                    Visa recept
+                  </Button>
+
+                  {isAuthenticated &&
+                    (() => {
+                      // Check if recipe is in any list
+                      const { inList, listId } = findRecipeList(recipe);
+
+                      return inList && listId ? (
+                        // If already in a list, show Remove button
+                        <Button
+                          variant="danger"
+                          size="small"
+                          className="mt-0 mb-0 mx-0"
+                          onClick={() => handleRemoveRecipe(recipe.id.toString(), listId)}
+                        >
+                          Ta bort
+                        </Button>
+                      ) : (
+                        // If not in any list, show Save button
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          className="mt-0 mb-0 mx-0"
+                          onClick={() => openAddToListModal(recipe)}
+                        >
+                          Spara
+                        </Button>
+                      );
+                    })()}
+
+                  {!isAuthenticated && (
+                    <Button
+                      variant="secondary"
+                      size="small"
+                      className="mt-0 mb-0 mx-0"
+                      onClick={() => openAddToListModal(recipe)}
+                      disabled={true}
+                    >
+                      Spara
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Loading indicator at bottom */}
+        {loading && (
+          <div className="text-center py-8">
+            <svg
+              className="animate-spin h-8 w-8 text-gray-500 mx-auto"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          </div>
+        )}
+
+        {/* Load more button */}
+        {!loading && recipes.length > 0 && (
+          <div className="text-center mt-8 mb-4">
+            <Button variant="secondary" size="medium" onClick={loadMore} className="mt-0 mb-0">
+              Ladda fler recept
+            </Button>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && recipes.length === 0 && (
+          <div className="text-center py-12 text-gray-600">
+            Inga recept hittades. Försök justera dina sökfilter.
+          </div>
+        )}
+      </div>
       {/* Add to List Modal */}
       {showListModal && selectedRecipe && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -683,7 +695,7 @@ const RecipeSearch = () => {
                     >
                       <span>{list.name || 'Unnamed list'}</span>
                       <span className="text-gray-500 text-sm">
-                        {list.recipes?.length || 0} recept
+                        {(list?.recipes || []).length} recept
                       </span>
                     </button>
                   ))
