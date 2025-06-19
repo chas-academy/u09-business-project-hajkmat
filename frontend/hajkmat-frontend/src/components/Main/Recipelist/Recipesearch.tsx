@@ -321,7 +321,7 @@ const RecipeSearch = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 flex justify-between items-center py-4 relative">
+    <div className="container mx-auto px-4 py-8">
       <div>
       {/* Search Form */}
       <form onSubmit={handleSearch} className="mb-6 bg-white p-4 rounded-lg shadow-sm">
