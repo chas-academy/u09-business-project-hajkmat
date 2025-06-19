@@ -321,7 +321,8 @@ const RecipeSearch = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="container mx-auto px-4 flex justify-between items-center py-4 relative">
+      <div>
       {/* Search Form */}
       <form onSubmit={handleSearch} className="mb-6 bg-white p-4 rounded-lg shadow-sm">
         {/* Using TextInput component for search */}
@@ -636,7 +637,7 @@ const RecipeSearch = () => {
           Inga recept hittades. Försök justera dina sökfilter.
         </div>
       )}
-
+</div>
       {/* Add to List Modal */}
       {showListModal && selectedRecipe && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
