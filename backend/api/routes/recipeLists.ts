@@ -4,6 +4,8 @@ import {
   getRecipeLists,
   updateRecipeList,
   deleteRecipeList,
+  addRecipeToList,
+  removeRecipeFromList,
 } from '../controllers/recipeListControllers';
 import { authenticate } from '../middleware/auth';
 
@@ -20,5 +22,11 @@ router.put('/:id', authenticate, updateRecipeList);
 
 // Delete a recipe list by ID
 router.delete('/:id', authenticate, deleteRecipeList);
+
+// Add a recipe to a list by ID
+router.post('/:id/recipes', authenticate, addRecipeToList);
+
+// Delete a recipe from a list by ID
+router.delete('/:listId/recipes/:recipeId', authenticate, removeRecipeFromList);
 
 export default router;
