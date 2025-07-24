@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_URL from '../../config/api';
+import RecipeListModal from './RecipeListModal';
 
 interface RecipeList {
   _id: string;
@@ -16,6 +17,9 @@ const RecipeListSection: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [newListName, setNewListName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedListId, setSelectedListId] = useState<string>('');
+  const [selectedListName, setSelectedListName] = useState<string>('');
   const navigate = useNavigate();
 
   // Fetch recipe lists
@@ -124,82 +128,121 @@ const RecipeListSection: React.FC = () => {
     }
   };
 
+  // Open modal to view recipes in a list
+  const handleViewRecipes = (listId: string, listName: string) => {
+    setSelectedListId(listId);
+    setSelectedListName(listName);
+    setShowModal(true);
+  };
+
+  // Close modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedListId('');
+    setSelectedListName('');
+  };
+
+  // Handle recipe removal from modal
+  const handleRecipeRemoved = (listId: string) => {
+    // Optionally refresh the recipe lists or show a success message
+    console.log(`Recipe removed from list ${listId}`);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-6 border-b pb-2">Mina receptlistor</h2>
+    <>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 border-b pb-2">Mina receptlistor</h2>
 
-      {/* Create new list form */}
-      <form onSubmit={handleCreateList} className="mb-6">
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={newListName}
-            onChange={e => setNewListName(e.target.value)}
-            placeholder="Ny receptlista..."
-            className="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isCreating}
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300"
-            disabled={isCreating || !newListName.trim()}
-          >
-            {isCreating ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              'Skapa'
-            )}
-          </button>
-        </div>
-      </form>
-
-      {/* Error message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded mb-4">{error}</div>
-      )}
-
-      {/* Recipe lists */}
-      {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : recipeLists.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <p>Du har inte skapat några receptlistor än.</p>
-          <p className="mt-2">Skapa din första lista med formuläret ovan.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {recipeLists.map(list => (
-            <div
-              key={list._id}
-              className="border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+        {/* Create new list form */}
+        <form onSubmit={handleCreateList} className="mb-6">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={newListName}
+              onChange={e => setNewListName(e.target.value)}
+              placeholder="Ny receptlista..."
+              className="flex-grow p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isCreating}
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-blue-300"
+              disabled={isCreating || !newListName.trim()}
             >
-              <div>
-                <h3 className="font-semibold text-lg">{list.name}</h3>
-                <p className="text-sm text-gray-500">
-                  Skapad {new Date(list.createdAt).toLocaleDateString()}
-                </p>
+              {isCreating ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                'Skapa'
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        {/* Recipe lists */}
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : recipeLists.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <p>Du har inte skapat några receptlistor än.</p>
+            <p className="mt-2">Skapa din första lista med formuläret ovan.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {recipeLists.map(list => (
+              <div
+                key={list._id}
+                className="border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+              >
+                <div>
+                  <h3 className="font-semibold text-lg">{list.name}</h3>
+                  <p className="text-sm text-gray-500">
+                    Skapad {new Date(list.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleViewRecipes(list._id, list.name)}
+                    className="bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 transition-colors"
+                  >
+                    Visa recept
+                  </button>
+                  <button
+                    onClick={() => navigate(`/recipe-lists/${list._id}`)}
+                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 transition-colors"
+                  >
+                    Redigera
+                  </button>
+                  <button
+                    onClick={() => handleDeleteList(list._id)}
+                    className="bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition-colors"
+                  >
+                    Ta bort
+                  </button>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => navigate(`/recipe-lists/${list._id}`)}
-                  className="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 transition-colors"
-                >
-                  Visa
-                </button>
-                <button
-                  onClick={() => handleDeleteList(list._id)}
-                  className="bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition-colors"
-                >
-                  Ta bort
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Recipe List Modal */}
+      <RecipeListModal
+        listId={selectedListId}
+        listName={selectedListName}
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onRecipeRemoved={handleRecipeRemoved}
+      />
+    </>
   );
 };
 

@@ -57,3 +57,29 @@ export const removeRecipeFromList = async (
     throw err;
   }
 };
+
+/**
+ * Get a specific recipe list with all its recipes
+ */
+export const getRecipeList = async (listId: string): Promise<RecipeList> => {
+  try {
+    const response = await fetch(`${API_URL}/recipe-lists/${listId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch recipe list');
+    }
+
+    const data = await response.json();
+    return data.list || data; // Handle different response formats
+  } catch (err) {
+    console.error('Error fetching recipe list:', err);
+    throw err;
+  }
+};
