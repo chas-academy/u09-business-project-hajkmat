@@ -6,6 +6,7 @@ import {
   deleteRecipeList,
   addRecipeToList,
   removeRecipeFromList,
+  getRecipeListById,
 } from '../controllers/recipeListControllers';
 import { authenticate } from '../middleware/auth';
 
@@ -16,6 +17,9 @@ router.post('/', authenticate, createRecipeList);
 
 // Get all recipe lists for the authenticated user
 router.get('/', authenticate, getRecipeLists);
+
+// Get a single recipe list by ID (with recipes populated)
+router.get('/:id', authenticate, getRecipeListById);
 
 // Update recipe list
 router.put('/:id', authenticate, updateRecipeList);

@@ -1,3 +1,26 @@
+// Get a single recipe list by ID (with recipes populated)
+export const getRecipeListById = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  if (!req.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const userId = req.user._id || req.user.id;
+
+  try {
+    const list = await RecipeList.findOne({ _id: id, userId: userId }).populate('recipes');
+    if (!list) {
+      res.status(404).json({ error: 'Recipe list not found' });
+      return;
+    }
+    res.status(200).json({ list });
+  } catch (error) {
+    console.error('Failed to retrieve recipe list:', error);
+    res.status(500).json({ error: 'Failed to retrieve recipe list' });
+  }
+};
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import RecipeList from '../models/recipeList';
