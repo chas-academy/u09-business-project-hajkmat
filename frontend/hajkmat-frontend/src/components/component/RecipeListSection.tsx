@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import API_URL from '../../config/api';
 import RecipeListModal from './RecipeListModal';
 
@@ -20,7 +19,7 @@ const RecipeListSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [selectedListName, setSelectedListName] = useState<string>('');
-  const navigate = useNavigate();
+
 
   // Fetch recipe lists
   useEffect(() => {
@@ -200,30 +199,24 @@ const RecipeListSection: React.FC = () => {
             {recipeLists.map(list => (
               <div
                 key={list._id}
-                className="border rounded-lg p-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+                className="border rounded-lg p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 hover:bg-gray-50 transition-colors"
               >
-                <div>
-                  <h3 className="font-semibold text-lg">{list.name}</h3>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg break-words">{list.name}</h3>
                   <p className="text-sm text-gray-500">
                     Skapad {new Date(list.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                   <button
                     onClick={() => handleViewRecipes(list._id, list.name)}
-                    className="bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200 transition-colors"
+                    className="bg-green-100 text-green-700 px-3 py-2 rounded w-full sm:w-auto transition duration-200 hover:bg-green-200"
                   >
                     Visa recept
                   </button>
                   <button
-                    onClick={() => navigate(`/recipe-lists/${list._id}`)}
-                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 transition-colors"
-                  >
-                    Redigera
-                  </button>
-                  <button
                     onClick={() => handleDeleteList(list._id)}
-                    className="bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition-colors"
+                    className="bg-red-100 text-red-700 px-3 py-2 rounded w-full sm:w-auto transition duration-200 hover:bg-red-200"
                   >
                     Ta bort
                   </button>
