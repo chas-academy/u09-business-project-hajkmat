@@ -2,6 +2,8 @@
 
 This is a full-stack web application for managing and sharing hiking recipes and recipe lists. The project is built with a React + Vite frontend and a Node.js + Express + MongoDB backend.
 
+https://hajkmat.netlify.app/
+
 ## Features
 - User authentication (login, protected routes)
 - Create, view, and delete recipe lists
