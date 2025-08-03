@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import API_URL from '../../config/api';
 import RecipeListModal from './RecipeListModal';
 
@@ -20,7 +19,7 @@ const RecipeListSection: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [selectedListName, setSelectedListName] = useState<string>('');
-  const navigate = useNavigate();
+
 
   // Fetch recipe lists
   useEffect(() => {
