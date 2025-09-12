@@ -196,9 +196,8 @@ const RecipeListModal: React.FC<RecipeListModalProps> = ({
                               variant="danger"
                               size="small"
                               className="mt-0 mb-0 mx-0"
-                              onClick={() =>
-                                handleRemoveRecipe((recipe._id || recipe.id).toString())
-                              }
+                              onClick={() => recipe._id && handleRemoveRecipe(recipe._id)}
+                              disabled={!recipe._id}
                             >
                               Ta bort
                             </Button>
