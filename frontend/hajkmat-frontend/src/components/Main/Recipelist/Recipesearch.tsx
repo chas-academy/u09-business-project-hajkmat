@@ -4,7 +4,7 @@ import Image from '../../component/Image';
 import Checkbox from '../../formcomponents/Checkbox';
 import TextInput from '../../formcomponents/TextInput';
 import { useAuth } from '../../../hooks/useAuth';
-import { addRecipeToList, removeRecipeFromList } from '../../../services/recipeListService';
+import { addRecipeToList } from '../../../services/recipeListService';
 import { Recipe } from '../../../types/recipe';
 import { RecipeList } from '../../../types/recipeList';
 import API_URL from '../../../config/api';
@@ -251,24 +251,6 @@ const RecipeSearch = () => {
     }
   };
 
-  const handleRemoveRecipe = async (
-    recipeId: string,
-    listId: string | undefined,
-  ): Promise<void> => {
-    if (!listId) {
-      console.error('Cannot remove recipe: Missing list ID');
-      return;
-    }
-    try {
-      const updatedList = await removeRecipeFromList(listId, recipeId);
-
-      setRecipeLists(prev => prev.map(list => (list.id === listId ? updatedList : list)));
-    } catch (err) {
-      console.error('Error removing recipe:', err);
-      alert('Kunde inte ta bort receptet från listan');
-    }
-  };
-
   const createNewList = async () => {
     if (!newListName.trim()) {
       setListNameError('Ange ett namn för din lista');
@@ -307,29 +289,6 @@ const RecipeSearch = () => {
       console.error('Error creating new list:', err);
       alert('Kunde inte skapa ny lista');
     }
-  };
-
-  const findRecipeList = (recipe: Recipe): { inList: boolean; listId: string } => {
-    if (!recipeLists || recipeLists.length === 0) {
-      return { inList: false, listId: '' };
-    }
-
-    for (const list of recipeLists) {
-      if (!list || !list.recipes) {
-        continue;
-      }
-      const isInList = list.recipes.some(
-        (listRecipe: Recipe) =>
-          (recipe.id && listRecipe.id === recipe.id) ||
-          (recipe._id && listRecipe._id === recipe._id) ||
-          (recipe.id && listRecipe.externalId === recipe.id),
-      );
-
-      if (isInList) {
-        return { inList: true, listId: list._id };
-      }
-    }
-    return { inList: false, listId: '' }; // Return empty string as fallback
   };
 
   return (
@@ -563,41 +522,12 @@ const RecipeSearch = () => {
                     Visa recept
                   </Button>
 
-                  {isAuthenticated &&
-                    (() => {
-                      // Check if recipe is in any list
-                      const { inList, listId } = findRecipeList(recipe);
-
-                      return inList && listId ? (
-                        // If already in a list, show Remove button
-                        <Button
-                          variant="danger"
-                          size="small"
-                          className="mt-0 mb-0 mx-0"
-                          onClick={() => handleRemoveRecipe(recipe.id.toString(), listId)}
-                        >
-                          Ta bort
-                        </Button>
-                      ) : (
-                        // If not in any list, show Save button
-                        <Button
-                          variant="secondary"
-                          size="small"
-                          className="mt-0 mb-0 mx-0"
-                          onClick={() => openAddToListModal(recipe)}
-                        >
-                          Spara
-                        </Button>
-                      );
-                    })()}
-
-                  {!isAuthenticated && (
+                  {isAuthenticated && (
                     <Button
                       variant="secondary"
                       size="small"
                       className="mt-0 mb-0 mx-0"
                       onClick={() => openAddToListModal(recipe)}
-                      disabled={true}
                     >
                       Spara
                     </Button>
