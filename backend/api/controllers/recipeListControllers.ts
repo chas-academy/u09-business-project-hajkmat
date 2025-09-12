@@ -213,32 +213,44 @@ export const removeRecipeFromList = async (req: Request, res: Response): Promise
     }
 
     const userId = req.user._id || req.user.id;
+    // Debug logging
+    console.log('removeRecipeFromList called with:', { listId, recipeId, userId });
 
-    const result = await RecipeList.updateOne(
-      { _id: listId, user: userId, recipes: recipeId },
-      {
-        $pull: { recipes: new Types.ObjectId(recipeId) },
-      },
-    );
+    // Ensure ObjectId types
+    const listObjectId = Types.ObjectId.isValid(listId) ? new Types.ObjectId(listId) : listId;
+    const recipeObjectId = Types.ObjectId.isValid(recipeId)
+      ? new Types.ObjectId(recipeId)
+      : recipeId;
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
 
-    if (result.matchedCount === 0) {
+    // Find the list and make sure it belongs to the user
+    const recipeList = await RecipeList.findOne({ _id: listObjectId, userId: userObjectId });
+    if (!recipeList) {
       res.status(404).json({
         success: false,
-        message: 'List not found or recipe not in list',
+        message: 'Recipe list not found',
       });
       return;
     }
 
-    if (result.modifiedCount === 0) {
-      res.status(400).json({
+    // Check if recipe is in the list
+    const recipeIndex = recipeList.recipes.findIndex(
+      (id: any) => id.toString() === recipeObjectId.toString(),
+    );
+    if (recipeIndex === -1) {
+      res.status(404).json({
         success: false,
-        message: 'Recipe not removed',
+        message: 'Recipe not in list',
       });
       return;
     }
+
+    // Remove the recipe
+    recipeList.recipes.splice(recipeIndex, 1);
+    await recipeList.save();
 
     // Get updated list
-    const updatedList = await RecipeList.findById(listId).populate('recipes');
+    const updatedList = await RecipeList.findById(listObjectId).populate('recipes');
 
     res.status(200).json({
       success: true,
@@ -246,7 +258,7 @@ export const removeRecipeFromList = async (req: Request, res: Response): Promise
     });
     return;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in removeRecipeFromList:', error);
     res.status(500).json({
       success: false,
       message: 'Server error',
