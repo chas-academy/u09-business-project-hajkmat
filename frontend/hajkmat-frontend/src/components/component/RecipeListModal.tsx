@@ -47,6 +47,14 @@ const RecipeListModal: React.FC<RecipeListModalProps> = ({
   const handleRemoveRecipe = async (recipeId: string) => {
     if (!recipeList) return;
 
+    // Debug log to verify IDs
+    console.log('Attempting to remove recipe:', {
+      listId,
+      recipeId,
+      typeofListId: typeof listId,
+      typeofRecipeId: typeof recipeId,
+    });
+
     try {
       const updatedList = await removeRecipeFromList(listId, recipeId);
       setRecipeList(updatedList);
